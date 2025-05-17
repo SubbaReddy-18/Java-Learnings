@@ -1,0 +1,263 @@
+import java.util.*;
+
+class Node {
+    int data;
+    Node next;
+    Node(int data) {
+        this.data = data;
+        this.next = null;
+    }
+}
+
+class Codechef {
+    public static void main(String[] args) throws java.lang.Exception {
+        int a[] = {
+            12,
+            3,
+            4,
+            5,
+            67
+        };
+        Node head = createLinkedList(a);
+        printHeadAndTail(head);
+        printLinkedList(head);
+        head = deleteHead(head);
+        printLinkedList(head);
+        head = deleteTail(head);
+        printLinkedList(head);
+        System.out.println("Deleteing the KthElement ");
+        head = deleteKthNode(head, 2);
+        printLinkedList(head);
+        System.out.println("Deleteing the element ");
+        head = deleteElement(head, 4);
+        printLinkedList(head);
+        System.out.println("Inserting an element at Head");
+        head = insertHead(head, 100);
+        printLinkedList(head);
+        System.out.println("Inserting an element at tail");
+        head = insertHead(head, 50);
+        printLinkedList(head);
+        System.out.println("Inserting an element Kth Position");
+        head = insertAtKthPosition(head, 40, 3);
+        printLinkedList(head);
+        System.out.println("Inserting a node before Value");
+        head = insertBeforeValue(head, 99, 5);
+        printLinkedList(head);
+
+
+    }
+
+    // Method to create a linked list from an array
+    public static Node createLinkedList(int[] a) {
+        Node head = new Node(a[0]);
+        Node mover = head;
+        for (int i = 1; i < a.length; i++) {
+            Node temp = new Node(a[i]);
+            mover.next = temp;
+            mover = temp;
+        }
+        return head;
+    }
+
+    // Method to print the head and tail of the linked list
+    public static void printHeadAndTail(Node head) {
+        if (head == null) {
+            System.out.println("The linked list is empty.");
+            return;
+        }
+        Node mover = head;
+        while (mover.next != null) {
+            mover = mover.next;
+        }
+        System.out.println("Head: " + head.data);
+        System.out.println("Tail: " + mover.data);
+    }
+
+    // Method to print all elements in the linked list
+    public static void printLinkedList(Node head) {
+        Node mover = head;
+        int length = 0;
+        while (mover != null) {
+            length++;
+            System.out.println("Element in the LL: " + mover.data);
+            mover = mover.next;
+        }
+        System.out.println("Length of the LL: " + length);
+    }
+
+    // Method to delete the head of the linked list
+    public static Node deleteHead(Node head) {
+        if (head == null) {
+            System.out.println("The head of the LL is null.");
+            return null;
+        } else {
+            head = head.next;
+            System.out.println("After removing old head, the new head is: " + (head != null ? head.data : "null"));
+            return head;
+        }
+    }
+
+    // Method to delete the tail of the linked list
+    public static Node deleteTail(Node head) {
+        if (head == null || head.next == null) {
+            System.out.println("The linked list is empty or has only one element.");
+            return null;
+        }
+        Node mover = head;
+        while (mover.next.next != null) {
+            mover = mover.next;
+        }
+        mover.next = null;
+        System.out.println("The latest tail after removing old tail: " + mover.data);
+        return head;
+    }
+
+    //method to delete Kth Element in Linked list
+    public static Node deleteKthNode(Node head, int k) {
+        if (head == null) {
+            return head;
+        }
+        if (k == 1) {
+            return deleteHead(head);
+        }
+        int count = 0;
+        Node mover = head;
+        Node prev = null;
+        while (mover != null) {
+            count++;
+            if (count == k) {
+                prev.next = prev.next.next;
+                break;
+            }
+            prev = mover;
+            mover = mover.next;
+        }
+        return head;
+    }
+
+    //Delete entire node with "VALUE" in LL;
+    public static Node deleteElement(Node head, int ele) {
+        if (head == null) {
+            return head;
+        }
+        if (head.data == ele) {
+            head = head.next;
+            return head;
+        }
+        Node mover = head;
+        Node prev = null;
+        while (mover != null) {
+            if (mover.data == ele) {
+                prev.next = mover.next;
+                break;
+            }
+            prev = mover;
+            mover = mover.next;
+        }
+        return head;
+    }
+
+    //Inserting an element before head and making new element as head;
+    public static Node insertHead(Node head, int value) {
+        Node temp = new Node(value);
+        temp.next = head;
+        head = temp;
+        return head;
+    }
+
+    //Inserting an element after Tail and making new element as Tail;
+    public static Node insertTail(Node head, int value) {
+        if (head == null) {
+            return new Node(value);
+        }
+        Node temp = head;
+        while (temp.next != null) {
+            temp = temp.next;
+        }
+        Node newTail = new Node(value);
+        temp.next = newTail;
+        return head;
+    }
+
+    //Inserting an element at Kth postion;
+    public static Node insertAtKthPosition(Node head, int eleValue, int k) {
+        if (head == null) {
+            return new Node(eleValue);
+        }
+        if (k == 1) { //if k==1 that is at 1st position
+            Node temp = new Node(eleValue);
+            temp.next = head;
+            return temp;
+        }
+        // if other tha k==1 then 
+        /*int count = 1;
+        Node temp = head;
+        while (temp != null) {
+
+            if (count == k - 1) {
+                // if other than k==1 then
+                //we use k-2 because we already checking k is greater than or equal to 2. 
+                Node newNode = new Node(eleValue);
+                newNode.next = temp.next;
+                temp.next = newNode;
+                //return head;
+                break;
+            }
+            count++;
+            temp = temp.next;
+        }
+
+        return head;*/
+        int count = 1;
+        Node temp = head;
+        while (temp != null && count < k - 1) {
+            temp = temp.next;
+            count++;
+        }
+        if (temp != null) {
+            Node newNode = new Node(eleValue);
+            newNode.next = temp.next;
+            temp.next = newNode;
+        }
+        return head;
+
+    }
+    
+    //Insert before value
+    public static Node insertBeforeValue(Node head,int el,int val){
+        if(head==null){
+            return null;
+        }
+        if(head.data==val){
+            return new Node(el);
+            // If the value is at the head, insert before head
+        }
+        Node temp=head;
+        while(temp.next!=null){
+            if(temp.next.data==val){
+                Node newNode=new Node(el);
+                newNode.next=temp.next;
+                temp.next=newNode;
+                return head;
+            }
+            temp=temp.next;
+        }
+        return head;
+    }
+
+public ListNode reverseList(ListNode head) {
+        ListNode prev = null;
+        ListNode current = head;
+        ListNode next = null;
+        while (current != null) {
+            next = current.next;
+            current.next = prev;
+            prev = current;
+            current = next;
+        }
+        head = prev;
+        return head;
+    }
+}
+
+}
