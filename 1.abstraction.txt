@@ -1,0 +1,656 @@
+1.abstraction:-Data Abstraction may also be defined as the process of identifying only the required characteristics of an object ignoring the irrelevant details.
+
+Example:-Sure, here's the same abstraction example in Java:
+
+In Java, abstraction is achieved using abstract classes and interfaces. Here's a simple example:
+
+
+abstract class Vehicle {
+    abstract void move();
+}
+
+class Car extends Vehicle {
+    void move() {
+        System.out.println("Car is moving");
+    }
+}
+
+class Boat extends Vehicle {
+    void move() {
+        System.out.println("Boat is moving");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Vehicle car = new Car();
+        Vehicle boat = new Boat();
+
+        car.move();
+        boat.move();
+    }
+}
+
+
+In this example, `Vehicle` is an abstract class with the abstract method `move`. `Car` and `Boat` are concrete classes that extend `Vehicle` and provide their own implementation of the `move` method. The user doesn't need to know about the internal implementation of how each vehicle moves; they just need to know that all vehicles can move. This is the essence of abstraction.
+
+advantages:-
+		1.Helps to increase the security of an application or program as only essential details are provided to the user.
+
+		2.Avoids code duplication and increases reusability.
+
+		3.Hides implementation details and exposes only relevant information.
+
+
+
+2.polymorphism :- Polymorphism allows us to perform a single action in different ways
+
+	1.Compile-time Polymorphism:-It is also known as static polymorphism. This type of polymorphism is achieved by function overloading.
+
+	2.Runtime Polymorphism:-Dynamic Binding or Method Overriding
+		the method to be invoked is determined at runtime, not at compile time. It’s achieved by method overriding, where a subclass provides a specific implementation of a method that is already provided by its parent class.
+
+
+
+
+Method overloading
+class Demo {
+    void show(int a) {
+        System.out.println("Method with int: " + a);
+    }
+
+    void show(String s) {
+        System.out.println("Method with String: " + s);
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Demo obj = new Demo();
+        obj.show(10);
+        obj.show("Hello");
+    }
+}
+
+
+method Overriding
+class Vehicle {
+    void move() {
+        System.out.println("Vehicles can move");
+    }
+}
+
+class Car extends Vehicle {
+   
+    void move() {
+        System.out.println("Car is moving");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Vehicle myVehicle = new Vehicle();
+        myVehicle.move();  // prints: Vehicles can move
+
+        Vehicle myCar = new Car();
+        myCar.move();  // prints: Car is moving
+    }
+}
+
+
+
+3.Encapsulation:-is defined as the wrapping up of data under a single unit. It is the mechanism that binds together code and the data it manipulates
+
+class Person{
+    private String name;
+    private long mobileNo;
+    
+    
+    public String getName(){
+        return name;
+    }
+    public void setName( String name){
+        this.name=name;
+    }
+    
+    public long getMobileNo(){
+        return mobileNo;
+    }
+    public void setMobileNo(long mobileNo){
+        this.mobileNo=mobileNo;
+    }
+}public class Main{
+public static void main(String []args){
+Person p=new Person();
+	    p.setName("hbeijb");
+	    p.setMobileNo(54667899);
+	    System.out.println(p.getName());
+	    System.out.println(p.getMobileNo());
+}
+}
+
+Example:-
+a.Data Hiding
+b.Reusability.
+
+
+
+4.Inheritennce
+
+import java.io.*;
+ 
+// Base or Super Class
+class Employee {
+    int salary = 60000;
+}
+ 
+// Inherited or Sub Class
+class Engineer extends Employee {
+    int benefits = 10000;
+}
+ 
+// Driver Class
+class Gfg {
+    public static void main(String args[])
+    {
+        Engineer E1 = new Engineer();
+        System.out.println("Salary : " + E1.salary
+                           + "\nBenefits : " + E1.benefits);
+    }
+}
+
+
+output
+Salary : 60000
+Benefits : 10000
+
+
+
+Java Inheritance Types
+
+1. Single Inheritance
+
+Definition: One class inherits the features of another class. 
+
+class Animal {
+    void eat() {
+        System.out.println("Eating...");
+    }
+}
+
+class Dog extends Animal {
+    void bark() {
+        System.out.println("Barking...");
+    }
+}
+Explanation: Here, Dog inherits from Animal. Dog can use the eat method from Animal.
+
+
+2. Multilevel Inheritance
+Definition: A class inherits from another class, and this new class is also inherited by another class. 
+
+class Animal {
+    void eat() {
+        System.out.println("Eating...");
+    }
+}
+
+class Dog extends Animal {
+    void bark() {
+        System.out.println("Barking...");
+    }
+}
+
+class Puppy extends Dog {
+    void weep() {
+        System.out.println("Weeping...");
+    }
+}
+
+Explanation: Here, Puppy inherits from Dog, and Dog inherits from Animal. Puppy can use both eat and bark methods.
+
+
+3. Hierarchical Inheritance
+Definition: Multiple classes inherit from a single class.
+
+
+class Animal {
+    void eat() {
+        System.out.println("Eating...");
+    }
+}
+
+class Dog extends Animal {
+    void bark() {
+        System.out.println("Barking...");
+    }
+}
+
+class Cat extends Animal {
+    void meow() {
+        System.out.println("Meowing...");
+    }
+}
+
+Explanation: Here, both Dog and Cat inherit from Animal. Both can use the eat method.
+
+4. Multiple Inheritance (via Interfaces)
+Definition: One class can inherit features from multiple sources. Java does not support this directly with classes but can achieve it through interfaces
+
+
+interface Animal {
+    void eat();
+}
+
+interface Pet {
+    void play();
+}
+
+class Dog implements Animal, Pet {
+    public void eat() {
+        System.out.println("Eating...");
+   .println("Playing...");
+    }
+}
+Explanation: Here, Dog implements both Animal and Pet interfaces, inheriting methods from both.
+
+5. Hybrid Inheritance
+Definition: A combination of two or more types of inheritance. Java does not support hybrid inheritance directly due to the complexity and potential for ambiguity, but it can be achieved through interfaces.
+
+interface Animal {
+    void eat();
+}
+
+interface Pet {
+    void play();
+}
+
+class Mammal {
+    void breathe() {
+        System.out.println("Breathing...");
+    }
+}
+
+class Dog extends Mammal implements Animal, Pet {
+    public void eat() {
+        System.out.println("Eating...");
+    }
+    
+    public void play() {
+        System.out.println("Playing...");
+    }
+}
+Explanation: Here, Dog inherits from Mammal and implements Animal and Pet interfaces, combining multiple inheritance types.
+
+
+Summary
+Single Inheritance: One class inherits from another.
+Multilevel Inheritance: A class inherits from another class, which is also inherited by another class.
+Hierarchical Inheritance: Multiple classes inherit from a single class.
+Multiple Inheritance: Achieved through interfaces.
+Hybrid Inheritance: Combination of inheritance types, typically using interfaces.
+
+
+Exception hadling
+
+Exception is an unwanted or unexpected event, which occurs during the execution of a program, i.e. at run time, that disrupts the normal flow of the program’s instructions.
+
+
+
+Types of Exceptions
+
+Exceptions can be categorized in two ways:
+
+1.Built-in Exceptions
+	a.Checked Exception(Checked exceptions are called compile-time exceptions because these exceptions are checked at compile-time by the compiler.)
+
+Examples:- IOException,SQLException.
+
+
+	b.Unchecked Exception (run -time exception;-The classes that inherit the RuntimeException are known as unchecked exceptions.)
+
+
+1.ArthmeticException
+
+public class JavaExceptionExample{  
+  public static void main(String args[]){  
+   try{  
+      //code that may raise exception  
+      int data=100/0;  
+   }catch(ArithmeticException e){System.out.println(e);}  
+   //rest code of the program   
+   System.out.println("rest of the code...");  
+  }  
+}  
+
+		
+2.NullPointerException.
+
+public class JavaExceptionExample{
+  public static void main(String args[]){
+   try{
+      String s=null;
+      System.out.println(s.length());
+   }catch(NullPointerException e){
+      System.out.println("Caught a NullPointerException");
+   }
+   System.out.println("rest of the code...");
+  }
+}
+
+
+
+
+3.NumberFormatException.
+
+public class JavaExceptionExample{
+  public static void main(String args[]){
+   try{
+      String s="abc";  
+      int i=Integer.parseInt(s);//NumberFormatException  
+   }catch(NumberFormatException e){
+      System.out.println("Caught a NumberFormatException ");
+   }
+   System.out.println("rest of the code...");
+  }
+}
+
+
+
+4.indexoutofBoundException.
+
+
+public class JavaExceptionExample{
+  public static void main(String args[]){
+   try{
+      int a[]=new int[5];  
+      a[10]=50;
+   }catch(ArrayIndexOutOfBoundsException e){
+      System.out.println("Caught a ArrayIndexOutOfBoundsException ");
+   }
+   System.out.println("rest of the code...");
+  }
+}
+f
+
+
+
+2.User-Defined Exceptions
+
+// Creating a user-defined exception
+class MyException extends Exception {
+    public MyException(String message) {
+        super(message);
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        try {
+            // Throw an instance of user-defined exception
+            throw new MyException("This is a custom message");
+        } catch (MyException ex) {
+            // Catch the user-defined exception and print the message
+            System.out.println("Caught the exception");
+            System.out.println(ex.getMessage());
+        }
+    }
+}
+
+In this code, MyException is a user-defined exception that extends the Exception class. It takes a string as a parameter and passes it to the superclass (Exception) constructor. In the main method, we throw an instance of MyException, then catch it and print the message.
+
+
+
+
+
+static Keyword
+
+The static keyword in Java is used for memory management primarily. It can be applied to variables, methods, blocks, and nested classes. Here’s a detailed look at each use case:
+
+Static Variables:
+
+
+Class Variables: Static variables are shared among all instances of a class. They are also known as class variables.
+Memory Allocation: Only one copy of a static variable is created, and it is shared among all instances.
+Usage: Useful for constants or variables that need to be shared across all instances.
+Java
+
+public class Example {
+    static int count = 0; // Static variable
+
+    Example() {
+        count++;
+    }
+
+    public static void main(String[] args) {
+        Example obj1 = new Example();
+        Example obj2 = new Example();
+        System.out.println(Example.count); // Output: 2
+    }
+}
+
+The count variable is shared among all instances of the Example class because it is static.
+Each time a new instance of Example is created, the constructor increments the count variable.
+After creating two instances (obj1 and obj2), the count variable has been incremented twice.
+Therefore, the value of count is 2 when it is printed.
+
+
+
+
+Static Methods:
+
+
+Class Methods: Static methods belong to the class rather than any instance.
+Access: They can be called without creating an instance of the class.
+Restrictions: Static methods cannot access instance variables or methods directly. They can only call other static methods and access static variables.
+Java
+
+public class Example {
+    static void display() {
+        System.out.println("Static method called");
+    }
+
+    public static void main(String[] args) {
+        Example.display(); // Calling static method without creating an instance
+    }
+
+Static Blocks:
+
+
+Initialization: Static blocks are used for static initialization of a class.
+Execution: They are executed when the class is loaded into memory.
+Java
+
+public class Example {
+    static {
+        System.out.println("Static block executed");
+    }
+
+    public static void main(String[] args) {
+        System.out.println("Main method executed");
+    }
+}
+
+
+Static Nested Classes:
+
+
+Nested Classes: Static nested classes can be accessed without creating an instance of the outer class.
+Usage: Useful for grouping classes that are only used in one place.
+Java
+
+public class OuterClass {
+    static class NestedClass {
+        void display() {
+            System.out.println("Static nested class method");
+        }
+    }
+
+    public static void main(String[] args) {
+        OuterClass.NestedClass nested = new OuterClass.NestedClass();
+        nested.display();
+    }
+}
+
+
+
+
+
+final Keyword
+
+
+The final keyword in Java is used to restrict the user. It can be applied to variables, methods, and classes. Here’s a detailed look at each use case:
+
+Final Variables:
+
+
+Constants: Final variables are constants. Once assigned, their value cannot be changed.
+Initialization: They must be initialized when declared or in the constructor.
+Java
+
+public class Example {
+    final int MAX_VALUE = 100; // Final variable
+
+    public static void main(String[] args) {
+        Example obj = new Example();
+        System.out.println(obj.MAX_VALUE);
+    }
+}
+
+
+
+Final Methods:
+
+
+
+Prevention of Overriding: Final methods cannot be overridden by subclasses.
+Usage: Useful for methods that should not be changed by subclasses.
+Java
+
+public class Example {
+    final void display() {
+        System.out.println("Final method");
+    }
+}
+
+class SubExample extends Example {
+    // void display() { // This will cause a compile-time error
+    //     System.out.println("Overridden method");
+    // }
+}
+
+Final Classes:
+Prevention of Inheritance: Final classes cannot be subclassed(Inherited).
+Usage: Useful for creating immutable classes or classes that should not be extended.
+Java
+
+public final class Example {
+    void display() {
+        System.out.println("Final class method");
+    }
+}
+
+// class SubExample extends Example { // This will cause a compile-time error
+// }
+
+Summary
+static: Used for class-level variables and methods, shared among all instances. It can also be used for static blocks and nested classes.
+final: Used to create constants, prevent method overriding, and prevent inheritance.
+
+
+1. String Pool
+
+Definition: The String Pool, also known as the String Constant Pool, is a special memory area in the heap where Java stores string literals. When you create a string literal, Java checks the pool first. If the string already exists, it returns the reference to the existing string. If not, it creates a new string in the pool.
+
+Example;
+
+String s1 = "Hello";
+String s2 = "Hello"; // s2 will reference the same object as s1
+String s3 = new String("Hello"); // s3 will create a new object in the heap
+
+Explanation: s1 and s2 refer to the same object in the String Pool, while s3 creates a new object in the heap 
+
+2. Heap Memory
+Definition: The heap is a memory area where Java objects are stored. It is shared among all threads and is used for dynamic memory allocation. Objects created using the new keyword are stored in the heap
+
+Example
+
+Person p = new Person(); // p is stored in the heap
+
+Explanation: The Person object is allocated in the heap memory
+
+
+3. Stack Memory
+Definition: The stack is a memory area that stores method calls, local variables, and references to objects in the heap. Each thread has its own stack, and the stack memory is used for short-lived variables.
+
+Example:
+
+public void method() {
+    int x = 10; // x is stored in the stack
+    Person p = new Person(); // p reference is stored in the stack, but the object is in the heap
+}
+
+Explanation: x is a local variable stored in the stack, while the reference p is stored in the stack, but the Person object is in the heap
+
+Summary.
+
+String Pool: Stores string literals in the heap.
+Heap Memory: Stores Java objects created with new.
+Stack Memory: Stores method calls, local variables, and references to heap objects.
+
+
+
+What is Garbage Collection?
+
+Garbage Collection (GC) is a process in Java that automatically identifies and removes objects that are no longer needed by the application, freeing up memory. This helps in managing memory efficiently and prevents memory leaks.
+
+Steps in Garbage Collection
+1.Marking : The first step in garbage collection is marking. During this phase, the garbage collector identifies which objects are still in use and which are not. It traverses the object graph starting from the root objects (like local variables, static variables, etc.) and marks all reachable objects.
+
+example:
+public class Main {
+    public static void main(String[] args) {
+        Person p = new Person(); // p is reachable
+    }
+}
+
+Explanation: The Person object referenced by p is marked as reachable.
+
+2.Sweeping :In the sweeping phase, the garbage collector removes the objects that were not marked during the marking phase. These objects are considered garbage and their memory is reclaimed.
+
+Example:
+public class Main {
+    public static void main(String[] args) {
+        Person p = new Person();
+        p = null; // p is no longer reachable
+    }
+}
+
+Explanation: The Person object is no longer reachable and will be swept away by the garbage collector.
+
+
+3.Comapcting :After sweeping, the memory may be fragmented. The compacting phase moves the remaining objects to a contiguous block of memory, reducing fragmentation and making memory allocation more efficient.
+
+Advantages of Garbage Collection
+
+Automatic Memory Management: No need for manual memory allocation and deallocation.
+
+Prevents Memory Leaks: Helps in managing memory leaks by automatically reclaiming unused memory.
+
+Improves Performance: Optimizes memory usage and improves application performance.
+
+Disadvantages of Garbage Collection
+
+CPU Overhead: Garbage collection requires CPU resources, which can affect application performance.
+
+Unpredictable Pauses: Some garbage collectors may cause unpredictable pauses in the application.
+
+Less Control: Developers have less control over memory management compared to manual allocation.
+
+Summary
+ff
+Garbage collection in Java involves marking, sweeping, and compacting phases to manage memory efficiently. Different garbage collectors are available to suit various application needs, each with its own advantages and disadvantages
+
+
+
+
