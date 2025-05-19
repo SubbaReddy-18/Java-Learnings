@@ -654,3 +654,54 @@ Garbage collection in Java involves marking, sweeping, and compacting phases to 
 
 
 
+What are Parallel Streams?
+Parallel Streams enable you to process elements concurrently, utilizing multiple CPU cores. This is in contrast to sequential streams, which process elements one at a time in a single thread.
+
+How to Create Parallel Streams
+There are two main ways to create parallel streams in Java:
+
+Using the parallelStream() Method:
+
+List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+numbers.parallelStream()
+       .filter(n -> n % 2 == 0)
+       .forEach(System.out::println);
+
+
+Using the parallel() Method on an existing sequential stream:
+
+List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+numbers.stream()
+       .parallel()
+       .filter(n -> n % 2 == 0)
+       .forEach(System.out::println);
+
+Benefits of Parallel Streams
+Performance Improvement: By utilizing multiple cores, parallel streams can significantly speed up the processing of large datasets.
+Ease of Use: Converting a sequential stream to a parallel stream is straightforward and requires minimal code changes.
+When to Use Parallel Streams
+Parallel streams are best used when:
+
+The order of execution does not matter.
+Elements do not depend on each other.
+The data source remains unchanged during processing
+
+
+
+Example
+Here’s a simple example demonstrating the use of parallel streams to filter and print even numbers from a list:
+
+import java.util.Arrays;
+import java.util.List;
+
+public class ParallelStreamExample {
+    public static void main(String[] args) {
+        List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+        numbers.parallelStream()
+               .filter(n -> n % 2 == 0)
+               .forEach(System.out::println);
+    }
+}
+Parallel streams can be a powerful tool when used appropriately.
+
+
