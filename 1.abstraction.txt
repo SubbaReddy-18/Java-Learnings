@@ -648,9 +648,57 @@ Unpredictable Pauses: Some garbage collectors may cause unpredictable pauses in 
 Less Control: Developers have less control over memory management compared to manual allocation.
 
 Summary
-
+ff
 Garbage collection in Java involves marking, sweeping, and compacting phases to manage memory efficiently. Different garbage collectors are available to suit various application needs, each with its own advantages and disadvantages
 
+What is concurrentHashMap?
+
+In Java, a ConcurrentHashMap is a thread-safe variant of HashMap designed for use in concurrent (multi-threaded) environments. It allows multiple threads to read and write without corrupting the internal data structure, making it ideal for high-performance, thread-safe operations.
+
+ When to Use ConcurrentHashMap
+Use ConcurrentHashMap when:
+
+You need a shared map accessed by multiple threads.
+You want better performance than synchronizing a HashMap manually.
+You need non-blocking reads and fine-grained locking for writes.
+
+Advantages
+
+Thread Safety: Safe for concurrent access without external synchronization.
+High Performance: Uses bucket-level locking (or lock striping) instead of locking the whole map.
+Non-blocking Reads: Reads can happen concurrently with updates.
+Scalability: Performs well under high concurrency.
+
+ Example
+import java.util.concurrent.ConcurrentHashMap;
+
+public class ConcurrentMapExample {
+    public static void main(String[] args) {
+        ConcurrentHashMap<String, Integer> map = new ConcurrentHashMap<>();
+
+        // Adding elements
+        map.put("Apple", 3);
+        map.put("Banana", 5);
+
+        // Reading elements
+        System.out.println("Apple count: " + map.get("Apple"));
+
+        // Updating elements
+        map.computeIfPresent("Apple", (key, val) -> val + 2);
+        System.out.println("Updated Apple count: " + map.get("Apple"));
+
+        // Concurrent access simulation
+        Runnable task = () -> {
+            map.put("Orange", 10);
+            System.out.println("Thread added Orange");
+        };
+
+        Thread t1 = new Thread(task);
+        Thread t2 = new Thread(task);
+        t1.start();
+        t2.start();
+    }
+}
 
 
 
