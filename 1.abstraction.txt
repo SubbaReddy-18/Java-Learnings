@@ -648,7 +648,7 @@ Unpredictable Pauses: Some garbage collectors may cause unpredictable pauses in 
 Less Control: Developers have less control over memory management compared to manual allocation.
 
 Summary
-ff
+
 Garbage collection in Java involves marking, sweeping, and compacting phases to manage memory efficiently. Different garbage collectors are available to suit various application needs, each with its own advantages and disadvantages
 
 
