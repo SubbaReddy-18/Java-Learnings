@@ -1,0 +1,246 @@
+1.using private in interface
+
+import java.util.*;
+import java.lang.*;
+import java.io.*;
+
+interface SendNotifications {
+	default void sendNotifications() {
+		establishConnection();
+		System.out.println("Sending multiple notifications");
+
+	}
+	default void sendNotification() {
+		establishConnection();
+		System.out.println("Sending  notification");
+
+	}
+	private void establishConnection() {
+		System.out.println("Establishing a connection");
+	}
+}
+class Codechef implements SendNotifications
+{
+	public static void main (String[] args) throws java.lang.Exception
+	{
+		SendNotifications s=new Codechef();
+		s.sendNotification();
+		s.sendNotifications();
+		
+	}
+}
+
+
+2.using static methods
+import java.util.*;
+import java.lang.*;
+import java.io.*;
+
+interface SendNotifications {
+	default void sendNotifications() {
+		establishConnection();
+		System.out.println("Sending multiple notifications");
+
+	}
+	default void sendNotification() {
+		establishConnection();
+		System.out.println("Sending  notification");
+
+	}
+	private void establishConnection() {
+		System.out.println("Establishing a connection");
+	}
+	static void sayHi(){
+	    sayHello();
+	    System.out.println("HI");
+	    
+	}
+	private static void sayHello(){
+	    System.out.println("Hello");
+	}
+}
+
+class Codechef implements SendNotifications
+{
+	public static void main (String[] args) throws java.lang.Exception
+	{
+		SendNotifications s=new Codechef();
+		s.sendNotification();
+		s.sendNotifications();
+		//SendNotifications.sayHello();
+		SendNotifications.sayHi();
+
+	}
+}
+
+
+3.Using Try with resouces;
+it is used because earlier we used to handle a resource with the catch and close the resource in finally block so now due to changes nod need to close.
+
+class MyWorker implements AutoCloseable {
+    MyWorker (){
+        System.out.println("Creating a resource");
+    }
+    public void doSomething(){
+        System.out.println("Doing Something");
+    }
+    public void close() throws Exception{
+        System.out.println("Closing a resource");
+    }
+
+
+}
+class Main{
+    public static void main (String[] args) {
+        MyWorker m= new MyWorker();
+        try(m){
+            m.doSomething();
+        }catch(Exception e){
+            
+        }
+    }
+}
+
+Output:
+Creating a resource
+Doing Something
+Closing a resource
+
+4.immutable Collections
+
+List
+
+Once the list is created it cant be changed.
+
+Example:-
+class Main {
+    public static void main(String[] args) {
+        List<String> l=List.of("a","b","e");//immutable list 
+        //l.add("c");//will get an error because above list is the immutable.
+        System.out.println(l);
+
+    }
+}
+class Main {
+    public static void main(String[] args) {
+        List<String> l=List.of("a","b","e",null);//will get nullpointer exception.
+        System.out.println(l);
+
+    }
+}
+
+Map
+Map<Integer,String> m=Map.of(1,"a",2,"b",3,"c");
+        System.out.println(m);
+
+output :-{1=a, 2=b, 3=c}
+
+while adding duplicate keys;
+
+Map<Integer,String> m=Map.of(1,"a",2,"b",3,"c",1,"d");
+        System.out.println(m);
+
+Exception in thread "main" java.lang.IllegalArgumentException: duplicate key: 1
+	at java.base/java.util.ImmutableCollections$MapN.<init>(ImmutableCollections.java:1196)
+	at java.base/java.util.Map.of(Map.java:1431)
+	at Main.main(Main.java:72)
+
+while adding null key;
+
+Map<Integer,String> m=Map.of(1,"a",2,"b",3,"c",null,"d");
+        System.out.println(m);
+
+Exception in thread "main" java.lang.NullPointerException
+	at java.base/java.util.Objects.requireNonNull(Objects.java:233)
+	at java.base/java.util.ImmutableCollections$MapN.<init>(ImmutableCollections.java:1191)
+	at java.base/java.util.Map.of(Map.java:1431)
+	at Main.main(Main.java:72)
+
+while null value:
+Map<Integer,String> m=Map.of(1,"a",2,"b",3,"c",4,"");
+        System.out.println(m);
+
+output:
+{4=, 3=c, 2=b, 1=a}
+
+
+Set:
+Set<String> set=Set.of("a","b","c");
+        System.out.println(set);
+output:
+[c, b, a]
+
+with duplicates:
+Set<String> set=Set.of("a","b","c","a");
+        System.out.println(set);
+Exception in thread "main" java.lang.IllegalArgumentException: duplicate element: a
+	at java.base/java.util.ImmutableCollections$SetN.<init>(ImmutableCollections.java:925)
+	at java.base/java.util.Set.of(Set.java:524)
+	at Main.main(Main.java:74)
+
+with null values for String, integer
+Set<String> set=Set.of("a","b","c","");
+        System.out.println(set);
+output:- [c, b, a, ]
+
+        Set<Integer> set2=Set.of(1,2,3,4,,6);
+        System.out.println(set2);// will get an error like illegale start.
+
+output:
+Main.java:76: error: illegal start of expression
+        Set<Integer> set2=Set.of(1,2,3,4,,6);
+
+
+5.@SafeVarargs
+
+What is @SafeVarargs?
+
+Imagine you're writing a method that takes a variable number of arguments (called varargs)—like a method that accepts any number of lists. Java gives a warning when you use generics with varargs because it can lead to heap pollution (a fancy way of saying: "you might accidentally mess up the type safety").
+
+
+✅ Java 9 Enhancement
+Before Java 9, you could only use @SafeVarargs on:
+
+static methods
+final methods
+constructors
+In Java 9, you can now also use it on private methods.
+
+🧪 Example in Java 9
+Example:-
+import java.util.List;
+
+public class SafeVarargsExample {
+
+    public static void main(String[] args) {
+        SafeVarargsExample example = new SafeVarargsExample();
+        example.printAll(List.of("Apple", "Banana"), List.of("Carrot", "Date"));
+    }
+
+    @SafeVarargs
+    private final void printAll(List<String>... lists) {
+        for (List<String> list : lists) {
+            for (String item : list) {
+                System.out.println(item);
+            }
+        }
+    }
+}
+
+🧍‍♂️ Human Analogy
+Imagine you're a chef who accepts any number of ingredient lists from different people. You promise the kitchen staff:
+
+“Don’t worry, I’ll make sure all the ingredients are safe and clean before cooking.”
+
+That’s what @SafeVarargs does—it tells the compiler:
+
+“I’ve checked these lists. They’re safe. No need to panic.”
+
+
+6.New methods in Stream Api
+	takeWhile(),dropWhile(),ofNullable();
+
+
+
+
+
