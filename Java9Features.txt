@@ -240,6 +240,41 @@ That’s what @SafeVarargs does—it tells the compiler:
 6.New methods in Stream Api
 	takeWhile(),dropWhile(),ofNullable();
 
+takeWhile()
+
+class Main {
+    public static void main(String[] args) {
+        List<Integer> l=Arrays.asList(10,40,7,18,23,30);
+        System.out.println(l.stream().filter(x->x%5==0).collect(Collectors.toList()));
+        System.out.println(l.stream().takeWhile(x->x%5==0).collect(Collectors.toList()));
+        
+
+    }
+}
+
+output:
+[10, 40, 30]//goes througth all the elements in  stream
+[10, 40]//the first flase statement hits while iteration in streams then it exists from the stream.
+
+dropWhile()
+
+System.out.println(l.stream().dropWhile(x->x%5==0).collect(Collectors.toList()));
+
+[7, 18, 23, 30]//it exits when first false is hit and returns all elements from first false to end of the elements.
+
+ofNullable()//manly used in flatMap() to handle the nullable values.
+
+List < Integer > l1 = Arrays.asList(10, 40, 7, 18, 23, 30, null);
+        System.out.println(l.stream()
+            .flatMap(x -> Optional.ofNullable(x)
+                .map(Stream::of).orElseGet(Stream::empty))
+            .collect(Collectors.toList()));
+output:
+[10, 40, 7, 18, 23, 30]
+
+
+
+
 
 
 
