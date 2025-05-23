@@ -272,9 +272,31 @@ List < Integer > l1 = Arrays.asList(10, 40, 7, 18, 23, 30, null);
 output:
 [10, 40, 7, 18, 23, 30]
 
+or 
+List<Integer> l=Arrays.asList(10,2,40,50,null);
+		System.out.println(l.stream().flatMap(x->Stream.ofNullable(x)).collect(Collectors.toList()));
+
+output:[10, 2, 40, 50]
 
 
+JSHELL
+its is tool of REPL(Read,evaluate,Print and Loop)
+it mainly used to write a code without creating class or loading class.
 
+
+JPMS(Java Platform Module Service)/Modules
+It is a Group of packages.Just like folders on your computer help organize files, modules help organize your Java code into manageable pieces.
+
+Why Use Modules?
+
+Better Organization: Imagine you have a huge project with lots of code. Modules help you group related code together, making it easier to find and manage.
+
+Controlled Access: Modules let you decide which parts of your code can be accessed by other parts. This is like having private and public areas in a building.
+
+Dependency Management: Modules help you keep track of which parts of your code need other parts to work. This is like knowing which ingredients you need for a recipe.
+
+
+we use keywords like export , reqiures, transitive
 
 
 
