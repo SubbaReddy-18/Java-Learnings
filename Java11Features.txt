@@ -1,0 +1,125 @@
+fetures are the 
+
+1.String API Updates
+2.File API  Updates
+3.isEmpty on Optional
+
+
+1.String API Updates:
+
+isBlank()
+
+String str="                    ";
+System.out.println(str.isBlank());
+
+output:true
+
+
+lines()
+
+
+String str="                    ";
+//System.out.println(str.isBlank());
+		
+str="Hi\nBro\nhow are you\n? ";
+System.out.println(str);
+System.out.println(str.lines());//as it accepts stream we can use .collect(Collectors.toList()) as well
+
+output:
+Hi
+Bro
+how are you
+? 
+java.util.stream.ReferencePipeline$Head@74a14482
+
+
+strip()
+
+char c='\u2000';//unicode for the space
+str=c+str;
+System.out.println(str);
+System.out.println(str.strip());
+System.out.println(str.stripLeading());
+System.out.println(str.stripTrailing());
+
+
+output:
+ Hi
+Bro
+how are you
+? //it has leading space
+Hi
+Bro
+how are you
+?//deleting those spaces.
+Hi
+Bro
+how are you
+? //deleting leading spaces
+ Hi
+Bro
+how are you
+?//deleting the trailing spaces.
+
+repeat()
+
+int x=10;
+System.out.println("-".repeat(5)+x);
+
+output:
+-----10
+
+
+Files API Updates:
+
+import java.util.*;
+import java.lang.*;
+import java.io.*;
+import java.util.stream.Stream;
+import java.util.stream.Collectors;
+import java.nio.file.Path;
+import java.nio.file.Files;
+
+
+class Codechef
+{
+	public static void main (String[] args) throws IOException
+	{
+		
+		Path path=Files.writeString(Files.createTempFile("test", ".txt"),"Java 11 feature ");
+		System.out.println(path);
+		String str =Files.readString(path);
+		System.out.println(str);
+
+	}
+}
+
+output:
+/tmp/test11144643536685457103.txt    //It gives the path of the file
+Java 11 feature.
+
+
+3.isEmpty() in Optional
+
+Optional<String> str=Optional.empty();
+System.out.println(str.isEmpty());
+	if(str.isEmpty()){
+		System.out.println(true);
+	}else{
+		 System.out.println(false);
+	}
+
+output:
+true
+true
+
+Deprications and Removal
+
+java.se.ee
+java.xml.ws
+java.activation
+java.transaction
+java.xml.bind
+java.cobra
+
+
