@@ -1,0 +1,225 @@
+farures are 
+1.sealed Classes //Made it as permananent feature.
+2.Random Generator Factories //used to generator a random number.
+3.Pattern  Matching in Switch  //like suse of the lambda , and functional interface in switch.
+4.Enhanced Deserialization
+
+
+
+
+1. Selaed Classes:-
+ 
+Purpose: Restrict which classes can extend or implement a class or interface.
+
+sealed interface Shape permits Circle, Rectangle {}
+
+final class Circle implements Shape {}
+final class Rectangle implements Shape {}
+
+Why it's useful: Improves control over class hierarchies and enhances security and maintainability.
+
+
+a): Pattern Matching for instanceof (Final Feature)
+	Purpose: Simplifies type checks and casting.
+
+	Example:
+		Object obj = "Hello Java 17";
+
+		if (obj instanceof String s) {
+    		System.out.println(s.toUpperCase()); // No need for explicit cast
+		}
+Why it's useful: Reduces boilerplate code and improves readability.
+
+
+2.Random Generator Factories:
+
+Here we can use anytype of algorithms we need.
+LXM:L128X1024MixRandom
+LXM:L128X128MixRandom
+LXM:L128X256MixRandom
+LXM:L32X64MixRandom
+LXM:L64X1024MixRandom
+LXM:L64X128MixRandom
+LXM:L64X128StarStarRandom
+LXM:L64X256MixRandom
+Legacy:Random
+Legacy:SecureRandom
+Legacy:SplittableRandom
+Xoroshiro:Xoroshiro128PlusPlus
+Xoshiro:Xoshiro256PlusPlus
+
+we need to make som changes like .of("name of the algorithm").create(//seed value like 888)
+
+
+package com.java.java17Features.random;
+
+import java.util.random.RandomGeneratorFactory;
+
+public class RandomGenerator {
+
+	public static void main(String[] args) {
+		// Create a default random generator
+		java.util.random.RandomGenerator randomGenerator = RandomGeneratorFactory.getDefault().create();
+		// Print the class of the random generator
+		System.out.println(randomGenerator.getClass());
+		// to get all te alogorithm used
+		RandomGeneratorFactory.all().map(factory->factory.group()+":"+factory.name())
+		.sorted()
+		.forEach(System.out::println);
+		int i = 0;
+		while (i <= 10) {
+			// Generate a random number between 0 and 19
+			int num = randomGenerator.nextInt(20);
+			System.out.println(num);
+			i++;
+
+		}
+	}
+
+}
+
+
+output:
+class jdk.random.L32X64MixRandom
+LXM:L128X1024MixRandom
+LXM:L128X128MixRandom
+LXM:L128X256MixRandom
+LXM:L32X64MixRandom
+LXM:L64X1024MixRandom
+LXM:L64X128MixRandom
+LXM:L64X128StarStarRandom
+LXM:L64X256MixRandom
+Legacy:Random
+Legacy:SecureRandom
+Legacy:SplittableRandom
+Xoroshiro:Xoroshiro128PlusPlus
+Xoshiro:Xoshiro256PlusPlus
+12
+11
+10
+1
+11
+0
+18
+12
+1
+17
+14
+
+
+
+3.Pattern Matching Switch.
+
+interface Shape {}
+
+record Circle(double radius) implements Shape {}
+
+record Rectangle(double length, double width) implements Shape {}
+
+class Codechef {
+    // Formal way
+    public static double getPerimeter(Shape shape) {
+        if (shape instanceof Circle c) {
+            return 2 * Math.PI * c.radius();
+        } else if (shape instanceof Rectangle r) {
+            return 2 * (r.length() + r.width());
+        } else {
+            throw new IllegalArgumentException("Unknown shape");
+        }
+    }
+
+    // Using enhanced switch
+    public static double getPerimeterUsingSwitch(Shape shape) {
+        return switch(shape) {
+            case Circle c -> 2 * Math.PI * c.radius();
+            case Rectangle r -> 2 * (r.length() + r.width());
+            default -> throw new IllegalArgumentException("Unexpected Value: " + shape);
+        };
+    }
+
+    public static void main(String[] args) {
+        System.out.println(getPerimeter(new Circle(10))); // Output: 62.83185307179586
+        System.out.println(getPerimeter(new Rectangle(10, 5))); // Output: 30.0
+        System.out.println(getPerimeterUsingSwitch(new Circle(10))); // Output: 62.83185307179586
+        System.out.println(getPerimeterUsingSwitch(new Rectangle(10, 5))); // Output: 30.0
+    }
+}
+
+
+// Using the null values in the switch cases,Using Null , Its supports null too.
+    public static void testNullSupport(Object obj){
+        switch(obj){
+            case String s->System.out.println("Hi");
+            case null-> System.out.println("Null Value");
+            default ->throw new IllegalArgumentException("Hey dont pass null values");
+        }
+    }
+
+testNullSupport("bvie");
+        testNullSupport(null);
+        testNullSupport(56);
+
+Output:-
+Hi
+Null Value
+Exception in thread "main" java.lang.IllegalArgumentException: Hey dont pass null values
+	at Codechef.testNullSupport(Main.java:32)
+	at Codechef.main(Main.java:44)
+
+
+4.Enhanced Deserialization
+
+Deserialization is the process of converting a byte stream back into a Java object. However, it can be a security risk if untrusted data is deserialized — attackers can exploit this to inject malicious objects.
+
+Java 17 improves this by making it easier to configure and enforce deserialization filters, which control what classes can be deserialized.
+
+Why is it important?
+
+Prevents deserialization of unexpected or dangerous classes.
+Helps avoid common security vulnerabilities like Remote Code Execution (RCE).
+Gives developers more control over what data is allowed during deserialization.
+
+How does it work?
+You can define a global filter using a system property or programmatically.
+
+✅ Example: Setting a Global Filter via System Property
+
+java -Djdk.serialFilter="maxdepth=5;
+classes=java.base/*;
+reject=java.util.HashMap" MyApp
+
+This filter:
+
+Limits object graph depth to 5.
+Allows only classes from java.base.
+Rejects HashMap deserialization.
+
+
+✅ Example: Programmatic Filter
+
+import java.io.*;
+import java.io.ObjectInputFilter.*;
+
+public class DeserializationExample {
+    public static void main(String[] args) throws Exception {
+        ObjectInputStream in = new ObjectInputStream(new FileInputStream("data.ser"));
+        
+        // Set a custom filter
+        in.setObjectInputFilter(info -> {
+            if (info.serialClass() != null && info.serialClass().getName().startsWith("java.lang")) {
+                return Status.ALLOWED;
+            }
+            return Status.REJECTED;
+        });
+
+        Object obj = in.readObject(); // Will only allow java.lang classes
+        System.out.println(obj);
+    }
+}
+
+✅ Summary
+Feature: Enhanced Deserialization Filters
+Introduced: Java 17
+Purpose: Improve security by controlling what classes can be deserialized
+Use Case: Prevent deserialization attacks in enterprise applications
+
