@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Java 9 Features Explorer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Visualization & Content Choices:
+        - Feature Navigation: HTML list + JS click handlers. Goal: Navigate. Interaction: Click to show feature details. Justification: Standard, intuitive navigation.
+        - Feature Details (Title, Description, Benefits): HTML text elements. Goal: Inform. Interaction: Dynamic update via JS. Justification: Clear presentation of textual information.
+        - Code Examples: HTML <pre>/<code> + JS for show/hide output and copy. Goal: Illustrate, Allow experimentation. Interaction: Click buttons. Justification: Interactive learning, practical utility.
+        - Analogies/Key Points: HTML blockquotes/callouts. Goal: Clarify. Interaction: Static. Justification: Emphasize important concepts.
+        - No charts used as the source material is descriptive and code-based, not quantitative.
+        - Library/Method: Vanilla JavaScript for all interactions, Tailwind CSS for styling.
+        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .code-block {
+            background-color: #2d3748; /* bg-gray-800 */
+            color: #e2e8f0; /* text-gray-200 */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.875rem;
+        }
+        .code-block pre {
+            margin: 0;
+        }
+        .output-block {
+            background-color: #f7fafc; /* bg-gray-100 */
+            color: #2d3748; /* text-gray-800 */
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            margin-top: 0.5rem;
+            border: 1px solid #e2e8f0; /* border-gray-300 */
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.875rem;
+        }
+        .sidebar-item {
+            cursor: pointer;
+            padding: 0.75rem 1rem;
+            border-radius: 0.375rem;
+            transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+        }
+        .sidebar-item:hover, .sidebar-item.active {
+            background-color: #0284c7; /* bg-sky-600 */
+            color: white;
+        }
+        .content-section {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .copy-button, .output-toggle-button {
+            background-color: #38bdf8; /* bg-sky-500 */
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .copy-button:hover, .output-toggle-button:hover {
+            background-color: #0ea5e9; /* bg-sky-600 */
+        }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 140px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -70px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .tooltip .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #555 transparent transparent transparent;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800">
+
+    <div class="flex flex-col md:flex-row min-h-screen">
+        <nav id="sidebar" class="w-full md:w-72 bg-slate-200 p-6 space-y-2 shadow-lg">
+            <h1 class="text-2xl font-bold text-sky-700 mb-6">Java 9 Features</h1>
+            <ul id="feature-list" class="space-y-1">
+                </ul>
+        </nav>
+
+        <main id="main-content" class="flex-1 p-6 md:p-10">
+            <div id="welcome-message" class="content-section bg-white p-8 rounded-xl shadow-lg">
+                <h2 class="text-3xl font-bold text-sky-700 mb-4">Welcome to the Java 9 Features Explorer!</h2>
+                <p class="text-lg mb-4">
+                    This interactive application provides an overview of key features introduced in Java 9. 
+                    Java 9 brought significant enhancements aimed at improving development productivity, code organization, and application performance.
+                </p>
+                <p class="mb-2">Explore features like:</p>
+                <ul class="list-disc list-inside mb-4 pl-4 space-y-1">
+                    <li>Private and Static Methods in Interfaces</li>
+                    <li>Try-with-Resources Enhancements</li>
+                    <li>Immutable Collections</li>
+                    <li>Stream API additions (`takeWhile`, `dropWhile`, `ofNullable`)</li>
+                    <li>The JShell REPL tool</li>
+                    <li>The Java Platform Module System (JPMS)</li>
+                    <li>And more...</li>
+                </ul>
+                <p>
+                    Select a feature from the sidebar to learn more, see code examples, and understand their benefits.
+                </p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const featuresData = [
+            {
+                id: "intro",
+                title: "Introduction to Java 9",
+                content: `
+                    <h2 class="text-3xl font-bold text-sky-700 mb-4">Java 9: Unveiling Key Enhancements</h2>
+                    <p class="text-lg mb-3">Java 9 introduced several significant features aimed at improving development, organization, and performance. This application covers:</p>
+                    <ul class="list-disc list-inside space-y-1 mb-4 pl-4">
+                        <li>Private Methods in Interfaces</li>
+                        <li>Static Methods in Interfaces</li>
+                        <li>Try-with-Resources Enhancements</li>
+                        <li>Immutable Collections</li>
+                        <li>@SafeVarargs Annotation Enhancements</li>
+                        <li>New Stream API Methods (takeWhile(), dropWhile(), ofNullable())</li>
+                        <li>JShell (REPL Tool)</li>
+                        <li>Java Platform Module System (JPMS/Modules)</li>
+                    </ul>
+                    <p>Select a feature from the navigation to dive deeper.</p>
+                `
+            },
+            {
+                id: "private-interface-methods",
+                title: "Private Methods in Interfaces",
+                content: `
+                    <h2 class="text-2xl font-semibold text-sky-600 mb-3">Enabling Code Reusability within Interfaces</h2>
+                    <p class="mb-2"><strong>Problem:</strong> Before Java 9, common helper methods for default methods in interfaces couldn't be truly private and reusable within the interface itself without exposing them.</p>
+                    <p class="mb-2"><strong>Solution:</strong> Java 9 allows interfaces to have private methods.</p>
+                    <p class="mb-4"><strong>Benefit:</strong> Promotes code reusability and encapsulation within interfaces, making default methods cleaner and more maintainable. Private methods can be static or non-static.</p>
+                    <h3 class="text-xl font-medium mb-2">Example:</h3>
+                    <div class="code-block" id="code-private-interface">
+<pre><code class="language-java">
+interface SendNotifications {
+    default void sendNotifications() {
+        establishConnection();
+        System.out.println("Sending multiple notifications");
+    }
+
+    default void sendNotification() {
+        establishConnection();
+        System.out.println("Sending notification");
+    }
+
+    // Private helper method
+    private void establishConnection() {
+        System.out.println("Establishing a connection");
+    }
+}
+
+class EmailNotifier implements SendNotifications {
+    public static void main(String[] args) {
+        SendNotifications notifier = new EmailNotifier();
+        notifier.sendNotification();
+        notifier.sendNotifications();
+    }
+}
+</code></pre>
+                    </div>
+                    <div class="mt-2 mb-4 space-x-2">
+                        <button class="output-toggle-button" data-target="output-private-interface">Show Output</button>
+                        <button class="copy-button" data-target="code-private-interface">Copy Code</button>
+                    </div>
+                    <div id="output-private-interface" class="output-block hidden">
+<pre>
+Establishing a connection
+Sending notification
+Establishing a connection
+Sending multiple notifications
+</pre>
+                    </div>
+                    <p class="mt-3">In this example, <code>establishConnection()</code> is a private method, hidden from implementing classes but reusable by default methods within the <code>SendNotifications</code> interface.</p>
+                `
+            },
+            {
+                id: "static-interface-methods",
+                title: "Static Methods in Interfaces",
+                content: `
+                    <h2 class="text-2xl font-semibold text-sky-600 mb-3">Utility Methods Directly on Interfaces</h2>
+                    <p class="mb-2"><strong>Feature:</strong> Java 9 allows interfaces to have static methods (which can also be private).</p>
+                    <p class="mb-4"><strong>Benefit:</strong> Provides a way to define utility methods directly on interfaces, similar to static methods in classes. These methods belong to the interface itself, not to any implementing class. This helps in organizing helper methods related to an interface in one place.</p>
+                    <h3 class="text-xl font-medium mb-2">Example:</h3>
+                    <div class="code-block" id="code-static-interface">
+<pre><code class="language-java">
+interface NotificationUtils {
+    // Public static method
+    static void log(String message) {
+        System.out.println("LOG: " + message);
+        performInternalLogging(message); // Can call private static methods
+    }
+
+    // Private static helper method (Java 9+)
+    private static void performInternalLogging(String message) {
+        System.out.println("INTERNAL LOG: Processing - " + message);
+    }
+
+    default void send() {
+        NotificationUtils.log("Sending notification via default method.");
+    }
+}
+
+class App implements NotificationUtils {
+    public static void main(String[] args) {
+        // Calling static method via interface name
+        NotificationUtils.log("Application started.");
+
+        App appInstance = new App();
+        appInstance.send();
+    }
+}
+</code></pre>
+                    </div>
+                    <div class="mt-2 mb-4 space-x-2">
+                        <button class="output-toggle-button" data-target="output-static-interface">Show Output</button>
+                        <button class="copy-button" data-target="code-static-interface">Copy Code</button>
+                    </div>
+                    <div id="output-static-interface" class="output-block hidden">
+<pre>
+LOG: Application started.
+INTERNAL LOG: Processing - Application started.
+LOG: Sending notification via default method.
+INTERNAL LOG: Processing - Sending notification via default method.
+</pre>
+                    </div>
+                    <p class="mt-3"><code>NotificationUtils.log()</code> is a public static method. Java 9 also allows <code>private static</code> methods like <code>performInternalLogging()</code> for internal utility within the interface.</p>
+                `
+            },
+            {
+                id: "try-with-resources",
+                title: "Try-with-Resources Enhancements",
+                content: `
+                    <h2 class="text-2xl font-semibold text-sky-600 mb-3">Simplified Resource Management</h2>
+                    <p class="mb-2"><strong>Background:</strong> Java 7 introduced try-with-resources to automatically close <code>AutoCloseable</code> resources, reducing boilerplate and potential resource leaks.</p>
+                    <p class="mb-4"><strong>Java 9 Enhancement:</strong> Allows using effectively final variables (or final variables) directly in the try-with-resources statement. Before Java 9, you had to declare a new variable within the try() block if the resource was initialized outside.</p>
+                    <h3 class="text-xl font-medium mb-2">Example:</h3>
+                    <div class="code-block" id="code-try-with-resources">
+<pre><code class="language-java">
+class MyWorker implements AutoCloseable {
+    private String name;
+    MyWorker(String name) {
+        this.name = name;
+        System.out.println(name + ": Creating resource");
+    }
+    public void doSomething() {
+        System.out.println(name + ": Doing Something");
+    }
+    @Override
+    public void close() throws Exception {
+        System.out.println(name + ": Closing resource");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+        MyWorker worker1 = new MyWorker("Worker1"); // Declared and initialized outside
+        
+        // Java 9: worker1 can be used directly as it's effectively final
+        try (worker1) {
+            worker1.doSomething();
+        }
+
+        // For comparison, pre-Java 9 style (or if worker1 was reassigned)
+        MyWorker worker2 = new MyWorker("Worker2");
+        try (MyWorker w2 = worker2) { // New variable w2 needed
+            w2.doSomething();
+        }
+    }
+}
+</code></pre>
+                    </div>
+                    <div class="mt-2 mb-4 space-x-2">
+                        <button class="output-toggle-button" data-target="output-try-with-resources">Show Output</button>
+                        <button class="copy-button" data-target="code-try-with-resources">Copy Code</button>
+                    </div>
+                    <div id="output-try-with-resources" class="output-block hidden">
+<pre>
+Worker1: Creating resource
+Worker1: Doing Something
+Worker1: Closing resource
+Worker2: Creating resource
+Worker2: Doing Something
+Worker2: Closing resource
+</pre>
+                    </div>
+                    <p class="mt-3">The enhancement makes the code cleaner when the resource variable is already initialized and effectively final.</p>
+                `
+            },
+            {
+                id: "immutable-collections",
+                title: "Immutable Collections",
+                content: `
+                    <h2 class="text-2xl font-semibold text-sky-600 mb-3">Creating Unmodifiable Collections Easily</h2>
+                    <p class="mb-2"><strong>Feature:</strong> Java 9 introduces static factory methods (e.g., <code>List.of()</code>, <code>Set.of()</code>, <code>Map.of()</code>) to create immutable collections.</p>
+                    <p class="mb-4"><strong>Benefits:</strong>
+                        <ul class="list-disc list-inside pl-4 mb-2">
+                            <li><strong>Thread-safety:</strong> Immutable objects are inherently thread-safe.</li>
+                            <li><strong>Predictable behavior:</strong> Their state doesn't change after creation.</li>
+                            <li><strong>Easier reasoning:</strong> Simplifies understanding data structures.</li>
+                            <li><strong>Memory efficiency:</strong> Can be optimized by the JVM.</li>
+                        </ul>
+                    These collections are truly immutable, not just unmodifiable views. Attempts to modify them (e.g., add, remove) will result in an <code>UnsupportedOperationException</code>. They also reject <code>null</code> elements/keys/values.
+                    </p>
+                    
+                    <h3 class="text-xl font-medium mb-2 mt-4">Immutable List Example:</h3>
+                    <div class="code-block" id="code-immutable-list">
+<pre><code class="language-java">
+import java.util.List;
+
+public class ImmutableListExample {
+    public static void main(String[] args) {
+        List<String> immutableList = List.of("Apple", "Banana", "Cherry");
+        System.out.println(immutableList);
+
+        try {
+            immutableList.add("Date"); // This will throw UnsupportedOperationException
+        } catch (UnsupportedOperationException e) {
+            System.out.println("Error adding to immutable list: " + e.getMessage());
+        }
+
+        try {
+            List<String> listWithNull = List.of("One", null, "Three"); // Throws NullPointerException
+        } catch (NullPointerException e) {
+            System.out.println("Error creating list with null: " + e.getClass().getSimpleName());
+        }
+    }
+}
+</code></pre>
+                    </div>
+                    <div class="mt-2 mb-4 space-x-2">
+                        <button class="output-toggle-button" data-target="output-immutable-list">Show Output</button>
+                        <button class="copy-button" data-target="code-immutable-list">Copy Code</button>
+                    </div>
+                    <div id="output-immutable-list" class="output-block hidden">
+<pre>
+[Apple, Banana, Cherry]
+Error adding to immutable list: null 
+Error creating list with null: NullPointerException
+</pre>
+                    </div>
+
+                    <h3 class="text-xl font-medium mb-2 mt-6">Immutable Map Example:</h3>
+                     <div class="code-block" id="code-immutable-map">
+<pre><code class="language-java">
+import java.util.Map;
+
+public class ImmutableMapExample {
+    public static void main(String[] args) {
+        Map<Integer, String> immutableMap = Map.of(1, "One", 2, "Two", 3, "Three");
+        System.out.println(immutableMap);
+
+        try {
+            Map<Integer, String> mapWithDuplicateKey = Map.of(1, "Uno", 1, "Ein"); // Throws IllegalArgumentException
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error with duplicate key: " + e.getMessage());
+        }
+        
+        try {
+            Map<Integer, String> mapWithNullValue = Map.of(1, "One", 2, null); // Throws NullPointerException
+        } catch (NullPointerException e) {
+            System.out.println("Error with null value: " + e.getClass().getSimpleName());
+        }
+    }
+}
+</code></pre>
+                    </div>
+                    <div class="mt-2 mb-4 space-x-2">
+                        <button class="output-toggle-button" data-target="output-immutable-map">Show Output</button>
+                        <button class="copy-button" data-target="code-immutable-map">Copy Code</button>
+                    </div>
+                    <div id="output-immutable-map" class="output-block hidden">
+<pre>
+{1=One, 2=Two, 3=Three}
+Error with duplicate key: duplicate key: 1
+Error with null value: NullPointerException
+</pre>
+                    </div>
+                    <p class="mt-3">Similar factory methods exist for <code>Set.of()</code>.</p>
+                `
+            },
+            {
+                id: "safevarargs",
+                title: "@SafeVarargs Annotation",
+                content: `
+                    <h2 class="text-2xl font-semibold text-sky-600 mb-3">Ensuring Type Safety with Varargs</h2>
+                    <p class="mb-2"><strong>What it is:</strong> The <code>@SafeVarargs</code> annotation is used to suppress warnings about potential "heap pollution" when using varargs (variable arguments) with generic types.</p>
+                    <p class="mb-2"><strong>Heap Pollution:</strong> Occurs when a variable of a parameterized type refers to an object that is not of that type. This can lead to a <code>ClassCastException</code> at runtime.</p>
+                    <p class="mb-4"><strong>Java 9 Enhancement:</strong> Before Java 9, <code>@SafeVarargs</code> could only be used on <code>static</code> methods, <code>final</code> instance methods, or constructors. In Java 9, it can now also be applied to <strong>private instance methods</strong>.</p>
+                    <h3 class="text-xl font-medium mb-2">Example:</h3>
+                    <div class="code-block" id="code-safevarargs">
+<pre><code class="language-java">
+import java.util.Arrays;
+import java.util.List;
+
+public class SafeVarargsExample {
+
+    // Java 9: @SafeVarargs allowed on private instance methods
+    @SafeVarargs
+    private final void displayElements(List<String>... lists) {
+        for (List<String> list : lists) {
+            System.out.println(list);
+        }
+    }
+
+    public static void main(String[] args) {
+        SafeVarargsExample example = new SafeVarargsExample();
+        List<String> list1 = Arrays.asList("Apple", "Banana");
+        List<String> list2 = Arrays.asList("Carrot", "Date");
+        
+        example.displayElements(list1, list2);
+    }
+}
+</code></pre>
+                    </div>
+                    <div class="mt-2 mb-4 space-x-2">
+                        <button class="output-toggle-button" data-target="output-safevarargs">Show Output</button>
+                        <button class="copy-button" data-target="code-safevarargs">Copy Code</button>
+                    </div>
+                    <div id="output-safevarargs" class="output-block hidden">
+<pre>
+[Apple, Banana]
+[Carrot, Date]
+</pre>
+                    </div>
+                    <p class="mt-3">By using <code>@SafeVarargs</code>, the developer asserts that the method's handling of the varargs parameter is type-safe, suppressing compiler warnings. The expansion to private instance methods provides more flexibility.</p>
+                `
+            },
+            {
+                id: "stream-api",
+                title: "New Stream API Methods",
+                content: `
+                    <h2 class="text-2xl font-semibold text-sky-600 mb-3">Enhanced Stream Operations</h2>
+                    <p class="mb-4">Java 9 introduced new methods to the Stream API for more flexible and efficient processing: <code>takeWhile()</code>, <code>dropWhile()</code>, and <code>Stream.ofNullable()</code>.</p>
+                    
+                    <h3 class="text-xl font-medium mb-2"><code>takeWhile(Predicate)</code></h3>
+                    <p class="mb-2">Returns a stream consisting of the longest prefix of elements taken from this stream that match the given predicate. It stops processing elements as soon as the predicate returns <code>false</code>.</p>
+                    <div class="code-block" id="code-takewhile">
+<pre><code class="language-java">
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class TakeWhileExample {
+    public static void main(String[] args) {
+        List<Integer> numbers = List.of(2, 4, 6, 7, 8, 10);
+        List<Integer> evenPrefix = numbers.stream()
+                                          .takeWhile(n -> n % 2 == 0)
+                                          .collect(Collectors.toList());
+        System.out.println("Original: " + numbers);
+        System.out.println("takeWhile(n -> n % 2 == 0): " + evenPrefix);
+    }
+}
+</code></pre>
+                    </div>
+                    <div class="mt-2 mb-4 space-x-2">
+                        <button class="output-toggle-button" data-target="output-takewhile">Show Output</button>
+                        <button class="copy-button" data-target="code-takewhile">Copy Code</button>
+                    </div>
+                    <div id="output-takewhile" class="output-block hidden">
+<pre>
+Original: [2, 4, 6, 7, 8, 10]
+takeWhile(n -> n % 2 == 0): [2, 4, 6]
+</pre>
+                    </div>
+
+                    <h3 class="text-xl font-medium mb-2 mt-6"><code>dropWhile(Predicate)</code></h3>
+                    <p class="mb-2">Returns a stream consisting of the remaining elements of this stream after dropping the longest prefix of elements that match the given predicate. It starts including elements from the point where the predicate first returns <code>false</code>.</p>
+                     <div class="code-block" id="code-dropwhile">
+<pre><code class="language-java">
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class DropWhileExample {
+    public static void main(String[] args) {
+        List<Integer> numbers = List.of(2, 4, 6, 7, 8, 10);
+        List<Integer> remainingAfterEvenPrefix = numbers.stream()
+                                                      .dropWhile(n -> n % 2 == 0)
+                                                      .collect(Collectors.toList());
+        System.out.println("Original: " + numbers);
+        System.out.println("dropWhile(n -> n % 2 == 0): " + remainingAfterEvenPrefix);
+    }
+}
+</code></pre>
+                    </div>
+                    <div class="mt-2 mb-4 space-x-2">
+                        <button class="output-toggle-button" data-target="output-dropwhile">Show Output</button>
+                        <button class="copy-button" data-target="code-dropwhile">Copy Code</button>
+                    </div>
+                    <div id="output-dropwhile" class="output-block hidden">
+<pre>
+Original: [2, 4, 6, 7, 8, 10]
+dropWhile(n -> n % 2 == 0): [7, 8, 10]
+</pre>
+                    </div>
+                    
+                    <h3 class="text-xl font-medium mb-2 mt-6"><code>Stream.ofNullable(T)</code></h3>
+                    <p class="mb-2">Creates a <code>Stream</code> of a single element if the element is non-null, or an empty <code>Stream</code> if the element is null. This is particularly useful with <code>flatMap()</code> to handle potentially null values gracefully within streams.</p>
+                     <div class="code-block" id="code-ofnullable">
+<pre><code class="language-java">
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+public class OfNullableExample {
+    public static void main(String[] args) {
+        List<String> items = List.of("Apple", null, "Banana", "Cherry", null);
+        
+        List<String> nonNullItems = items.stream()
+                                         .flatMap(Stream::ofNullable) // item -> Stream.ofNullable(item)
+                                         .collect(Collectors.toList());
+        System.out.println("Original with nulls: " + items);
+        System.out.println("Processed with Stream.ofNullable: " + nonNullItems);
+
+        // Example with a single nullable value
+        String value = null;
+        long count = Stream.ofNullable(value).count();
+        System.out.println("Count for null value: " + count); // 0
+
+        value = "Exists";
+        count = Stream.ofNullable(value).count();
+        System.out.println("Count for non-null value: " + count); // 1
+    }
+}
+</code></pre>
+                    </div>
+                    <div class="mt-2 mb-4 space-x-2">
+                        <button class="output-toggle-button" data-target="output-ofnullable">Show Output</button>
+                        <button class="copy-button" data-target="code-ofnullable">Copy Code</button>
+                    </div>
+                    <div id="output-ofnullable" class="output-block hidden">
+<pre>
+Original with nulls: [Apple, null, Banana, Cherry, null]
+Processed with Stream.ofNullable: [Apple, Banana, Cherry]
+Count for null value: 0
+Count for non-null value: 1
+</pre>
+                    </div>
+                `
+            },
+            {
+                id: "jshell",
+                title: "JShell (REPL Tool)",
+                content: `
+                    <h2 class="text-2xl font-semibold text-sky-600 mb-3">Interactive Java Programming</h2>
+                    <p class="mb-2"><strong>What it is:</strong> JShell is a Read-Eval-Print-Loop (REPL) tool introduced in Java 9.</p>
+                    <p class="mb-4"><strong>Purpose:</strong> Allows developers to execute Java code snippets interactively without the need to create a class, compile files, or write a full <code>main</code> method.</p>
+                    <h3 class="text-xl font-medium mb-2">Benefits:</h3>
+                    <ul class="list-disc list-inside pl-4 mb-4">
+                        <li><strong>Rapid Prototyping:</strong> Quickly test ideas and algorithms.</li>
+                        <li><strong>API Exploration:</strong> Experiment with Java APIs and third-party libraries.</li>
+                        <li><strong>Learning Java:</strong> An excellent tool for beginners to learn Java syntax and concepts interactively.</li>
+                        <li><strong>Debugging:</strong> Test small pieces of code in isolation.</li>
+                    </ul>
+                    <p class="mb-2">To use JShell, you typically run <code>jshell</code> from your command line/terminal (if JDK 9+ is installed and in your PATH).</p>
+                    <h3 class="text-xl font-medium mb-2">Example JShell Session:</h3>
+                    <div class="code-block">
+<pre><code class="shell">
+$ jshell
+|  Welcome to JShell -- Version 17.0.1 (or your Java version)
+|  For an introduction type: /help intro
+
+jshell> int x = 10;
+x ==> 10
+
+jshell> int y = 20;
+y ==> 20
+
+jshell> System.out.println("Sum: " + (x + y));
+Sum: 30
+
+jshell> String message = "Hello, JShell!";
+message ==> "Hello, JShell!"
+
+jshell> message.toUpperCase()
+$5 ==> "HELLO, JSHELL!"
+
+jshell> /exit
+|  Goodbye
+</code></pre>
+                    </div>
+                    <p class="mt-3">JShell provides immediate feedback, making it a powerful tool for quick coding tasks and learning.</p>
+                `
+            },
+            {
+                id: "jpms",
+                title: "Java Platform Module System (JPMS)",
+                content: `
+                    <h2 class="text-2xl font-semibold text-sky-600 mb-3">Modularizing the Java Platform</h2>
+                    <p class="mb-2"><strong>Concept:</strong> The Java Platform Module System (JPMS), also known as Project Jigsaw, introduces modules to Java. A module is a group of related packages and resources, along with a module descriptor file (<code>module-info.java</code>).</p>
+                    <p class="mb-4">Modules are like well-defined components that can explicitly state their dependencies and what parts of their API they make available to other modules.</p>
+                    
+                    <h3 class="text-xl font-medium mb-2">Why Use Modules?</h3>
+                    <ul class="list-disc list-inside pl-4 mb-4">
+                        <li><strong>Better Organization (Reliable Configuration):</strong> Helps group related code into distinct modules, making large projects easier to understand, manage, and maintain. Dependencies are explicitly declared, preventing missing pieces at runtime.</li>
+                        <li><strong>Strong Encapsulation (Controlled Access):</strong> Modules explicitly define which packages (and thus types) are exported (publicly accessible) to other modules. By default, packages within a module are not accessible from outside, improving security and maintainability.</li>
+                        <li><strong>Scalability and Performance:</strong> Allows for creating smaller runtime images by including only the necessary modules. Can improve startup time and reduce memory footprint.</li>
+                        <li><strong>Improved Dependency Management:</strong> Clearly defines dependencies between modules, helping to avoid "classpath hell" and version conflicts.</li>
+                    </ul>
+
+                    <h3 class="text-xl font-medium mb-2">Key Concepts & Keywords:</h3>
+                    <ul class="list-disc list-inside pl-4 mb-4">
+                        <li><strong><code>module-info.java</code>:</strong> A file at the root of a module's source code that declares the module's properties.</li>
+                        <li><strong><code>module com.example.mymodule { ... }</code>:</strong> Defines a module.</li>
+                        <li><strong><code>requires com.example.othermodule;</code>:</strong> Declares a dependency on another module. This module can access exported packages from <code>com.example.othermodule</code>.</li>
+                        <li><strong><code>exports com.example.mypackage;</code>:</strong> Makes the public types in <code>com.example.mypackage</code> accessible to other modules that require this module.</li>
+                        <li><strong><code>requires transitive com.example.anothermodule;</code>:</strong> Any module that requires the current module also implicitly requires <code>com.example.anothermodule</code>.</li>
+                        <li><strong><code>opens com.example.internalpackage;</code>:</strong> Allows other modules to access types in this package via reflection, even if not exported.</li>
+                        <li><strong><code>uses com.example.serviceinterface;</code>:</strong> Declares that this module uses services that implement the given interface.</li>
+                        <li><strong><code>provides com.example.serviceinterface with com.example.serviceimplementation;</code>:</strong> Declares that this module provides an implementation for a given service interface.</li>
+                    </ul>
+                    <p class="mt-3">JPMS is a fundamental change to the Java platform, aiming to make Java more scalable, secure, and maintainable for large applications and the JDK itself.</p>
+                `
+            }
+        ];
+
+        const featureList = document.getElementById('feature-list');
+        const mainContent = document.getElementById('main-content');
+        const welcomeMessage = document.getElementById('welcome-message');
+
+        function displayFeature(featureId) {
+            const feature = featuresData.find(f => f.id === featureId);
+            if (feature) {
+                welcomeMessage.classList.add('hidden');
+                mainContent.innerHTML = `<div class="content-section bg-white p-6 md:p-8 rounded-xl shadow-lg">${feature.content}</div>`;
+                
+                document.querySelectorAll('.output-toggle-button').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const targetId = button.dataset.target;
+                        const outputBlock = document.getElementById(targetId);
+                        if (outputBlock) {
+                            outputBlock.classList.toggle('hidden');
+                            button.textContent = outputBlock.classList.contains('hidden') ? 'Show Output' : 'Hide Output';
+                        }
+                    });
+                });
+
+                document.querySelectorAll('.copy-button').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const targetId = button.dataset.target;
+                        const codeBlock = document.getElementById(targetId);
+                        if (codeBlock) {
+                            const codeToCopy = codeBlock.querySelector('pre code').innerText;
+                            try {
+                                const_temp_textarea = document.createElement('textarea');
+                                const_temp_textarea.value = codeToCopy;
+                                document.body.appendChild(const_temp_textarea);
+                                const_temp_textarea.select();
+                                document.execCommand('copy');
+                                document.body.removeChild(const_temp_textarea);
+                                
+                                const originalText = button.textContent;
+                                button.textContent = 'Copied!';
+                                setTimeout(() => {
+                                    button.textContent = originalText;
+                                }, 2000);
+
+                            } catch (err) {
+                                console.error('Failed to copy: ', err);
+                                alert('Failed to copy code. Please copy manually.');
+                            }
+                        }
+                    });
+                });
+
+                // Update active sidebar item
+                document.querySelectorAll('#feature-list li').forEach(item => {
+                    item.classList.remove('active');
+                    if (item.dataset.featureId === featureId) {
+                        item.classList.add('active');
+                    }
+                });
+
+            } else if (featureId === 'home') {
+                 mainContent.innerHTML = ''; // Clear specific feature content
+                 mainContent.appendChild(welcomeMessage); // Re-add welcome message
+                 welcomeMessage.classList.remove('hidden');
+                 document.querySelectorAll('#feature-list li').forEach(item => item.classList.remove('active'));
+                 document.querySelector('#feature-list li[data-feature-id="home"]').classList.add('active');
+            }
+        }
+
+        function init() {
+            // Populate sidebar
+            const homeLi = document.createElement('li');
+            homeLi.textContent = "Home / Overview";
+            homeLi.classList.add('sidebar-item', 'active');
+            homeLi.dataset.featureId = 'home';
+            homeLi.addEventListener('click', () => displayFeature('home'));
+            featureList.appendChild(homeLi);
+            
+            featuresData.forEach(feature => {
+                if (feature.id === 'intro') return; // Skip the intro slide for individual listing if home is separate
+                const listItem = document.createElement('li');
+                listItem.textContent = feature.title;
+                listItem.classList.add('sidebar-item');
+                listItem.dataset.featureId = feature.id;
+                listItem.addEventListener('click', () => displayFeature(feature.id));
+                featureList.appendChild(listItem);
+            });
+
+            // Initial display (Home/Welcome)
+            displayFeature('home');
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
