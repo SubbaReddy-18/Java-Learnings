@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Java 11 Features Explorer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Visualization & Content Choices:
+        - Feature Sections: Each feature (String API Updates, File API Updates, Optional.isEmpty(), Deprecations) is a distinct, collapsible HTML div. Goal: Organize, Inform. Interaction: Click to expand/collapse. Justification: Reduces visual clutter, allows focused exploration.
+        - Code Examples: Presented within <pre><code> tags. Goal: Illustrate. Interaction: Static display with copy button. Justification: Direct code reference.
+        - Output: Displayed in a separate block, toggleable. Goal: Inform. Interaction: Click to show/hide. Justification: Provides immediate context for code.
+        - No charts used as the source material is descriptive and code-based, not quantitative data.
+        - Library/Method: Vanilla JavaScript for all interactions, Tailwind CSS for styling.
+        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9; /* bg-slate-100 */
+            color: #334155; /* text-slate-800 */
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background-color: #ffffff; /* bg-white */
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background-color: #0284c7; /* bg-sky-700 */
+            color: white;
+            padding: 1.5rem;
+            border-radius: 0.75rem 0.75rem 0 0;
+            text-align: center;
+            margin: -1.5rem -1.5rem 1.5rem -1.5rem; /* Adjust to extend to container edges */
+            font-size: 2.25rem; /* text-4xl */
+            font-weight: bold; /* font-bold */
+        }
+        .feature-card {
+            border: 1px solid #e2e8f0; /* border-slate-200 */
+            border-radius: 0.5rem; /* rounded-lg */
+            overflow: hidden;
+            margin-bottom: 1rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        .feature-header {
+            background-color: #f8fafc; /* bg-slate-50 */
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600; /* font-semibold */
+            font-size: 1.25rem; /* text-xl */
+            color: #0f172a; /* text-slate-900 */
+            transition: background-color 0.2s ease;
+        }
+        .feature-header:hover {
+            background-color: #e2e8f0; /* bg-slate-200 */
+        }
+        .feature-content {
+            padding: 1.5rem;
+            border-top: 1px solid #e2e8f0; /* border-slate-200 */
+            display: none; /* Hidden by default */
+            background-color: #ffffff; /* bg-white */
+        }
+        .feature-content.active {
+            display: block;
+        }
+        .code-block {
+            background-color: #1e293b; /* bg-gray-800 */
+            color: #f8fafc; /* text-gray-50 */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.875rem;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+        .output-block {
+            background-color: #f0f4f8; /* bg-slate-200 */
+            color: #1e293b; /* text-slate-900 */
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            margin-top: 0.5rem;
+            border: 1px solid #cbd5e1; /* border-slate-300 */
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.875rem;
+            white-space: pre-wrap; /* Preserve whitespace and wrap */
+            word-break: break-all; /* Break long words */
+        }
+        .toggle-button, .copy-button {
+            background-color: #0ea5e9; /* bg-sky-500 */
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            margin-right: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .toggle-button:hover, .copy-button:hover {
+            background-color: #0284c7; /* bg-sky-600 */
+        }
+        .arrow-icon {
+            transition: transform 0.3s ease;
+        }
+        .feature-header.expanded .arrow-icon {
+            transform: rotate(90deg);
+        }
+        ul {
+            list-style-type: disc;
+            margin-left: 1.25rem;
+            margin-bottom: 1rem;
+        }
+        h3 {
+            font-size: 1.125rem; /* text-lg */
+            font-weight: 600; /* font-semibold */
+            color: #0f172a; /* text-slate-900 */
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            Java 11 Features Explorer
+        </div>
+
+        <p class="mb-6 text-lg text-center">
+            Explore key enhancements introduced in Java 11, including String API updates, File API improvements, and changes to the Optional class.
+        </p>
+
+        <div class="feature-card">
+            <div class="feature-header" onclick="toggleFeature(this)">
+                <span>1. String API Updates</span>
+                <span class="arrow-icon">&#9658;</span>
+            </div>
+            <div class="feature-content">
+                <p>Java 11 introduced several new utility methods to the `String` class, making common string operations more concise and efficient.</p>
+
+                <h3>`isBlank()`</h3>
+                <p>Checks if a string is empty or contains only whitespace characters.</p>
+                <div class="code-block" id="code-isBlank">
+<pre><code class="language-java">
+String str = "                    ";
+System.out.println(str.isBlank());
+</code></pre>
+                </div>
+                <button class="toggle-button" data-target="output-isBlank">Show Output</button>
+                <button class="copy-button" data-target="code-isBlank">Copy Code</button>
+                <div class="output-block hidden" id="output-isBlank">
+<pre>
+true
+</pre>
+                </div>
+
+                <h3>`lines()`</h3>
+                <p>Returns a `Stream` of lines from the string, separated by line terminators.</p>
+                <div class="code-block" id="code-lines">
+<pre><code class="language-java">
+String str = "Hi\nBro\nhow are you\n? ";
+System.out.println(str);
+System.out.println(str.lines().collect(java.util.stream.Collectors.toList()));
+</code></pre>
+                </div>
+                <button class="toggle-button" data-target="output-lines">Show Output</button>
+                <button class="copy-button" data-target="code-lines">Copy Code</button>
+                <div class="output-block hidden" id="output-lines">
+<pre>
+Hi
+Bro
+how are you
+? 
+[Hi, Bro, how are you, ? ]
+</pre>
+                </div>
+
+                <h3>`strip()`, `stripLeading()`, `stripTrailing()`</h3>
+                <p>These methods remove whitespace from the beginning, end, or both, similar to `trim()` but are Unicode-aware (they remove all Unicode whitespace characters).</p>
+                <div class="code-block" id="code-strip">
+<pre><code class="language-java">
+char c = '\u2000'; // Unicode for the space
+String strWithUnicodeSpace = c + "Hi\nBro\nhow are you\n? " + c;
+System.out.println("Original: '" + strWithUnicodeSpace + "'");
+System.out.println("strip(): '" + strWithUnicodeSpace.strip() + "'");
+System.out.println("stripLeading(): '" + strWithUnicodeSpace.stripLeading() + "'");
+System.out.println("stripTrailing(): '" + strWithUnicodeSpace.stripTrailing() + "'");
+</code></pre>
+                </div>
+                <button class="toggle-button" data-target="output-strip">Show Output</button>
+                <button class="copy-button" data-target="code-strip">Copy Code</button>
+                <div class="output-block hidden" id="output-strip">
+<pre>
+Original: ' Hi
+Bro
+how are you
+?  '
+strip(): 'Hi
+Bro
+how are you
+? '
+stripLeading(): 'Hi
+Bro
+how are you
+?  '
+stripTrailing(): ' Hi
+Bro
+how are you
+? '
+</pre>
+                </div>
+
+                <h3>`repeat(int count)`</h3>
+                <p>Returns a new string that is the concatenation of the original string repeated `count` times.</p>
+                <div class="code-block" id="code-repeat">
+<pre><code class="language-java">
+int x = 10;
+System.out.println("-".repeat(5) + x);
+</code></pre>
+                </div>
+                <button class="toggle-button" data-target="output-repeat">Show Output</button>
+                <button class="copy-button" data-target="code-repeat">Copy Code</button>
+                <div class="output-block hidden" id="output-repeat">
+<pre>
+-----10
+</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-header" onclick="toggleFeature(this)">
+                <span>2. Files API Updates (`readString()`, `writeString()`)</span>
+                <span class="arrow-icon">&#9658;</span>
+            </div>
+            <div class="feature-content">
+                <p>Java 11 added convenient static methods to the `java.nio.file.Files` class for reading and writing strings to/from files, simplifying file I/O operations.</p>
+                <div class="code-block" id="code-files-api">
+<pre><code class="language-java">
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Files;
+
+class FilesApiExample {
+    public static void main(String[] args) throws IOException {
+        // Create a temporary file and write a string to it
+        Path path = Files.writeString(Files.createTempFile("test", ".txt"), "Java 11 feature content.");
+        System.out.println("File created at: " + path);
+
+        // Read the content of the file as a string
+        String content = Files.readString(path);
+        System.out.println("Content read from file: " + content);
+
+        // Clean up the temporary file (optional, but good practice)
+        Files.delete(path);
+        System.out.println("Temporary file deleted.");
+    }
+}
+</code></pre>
+                </div>
+                <button class="toggle-button" data-target="output-files-api">Show Output</button>
+                <button class="copy-button" data-target="code-files-api">Copy Code</button>
+                <div class="output-block hidden" id="output-files-api">
+<pre>
+File created at: /tmp/test[some_numbers].txt
+Content read from file: Java 11 feature content.
+Temporary file deleted.
+</pre>
+                </div>
+                <p class="text-sm text-slate-600 mt-2">Note: The exact path of the temporary file will vary.</p>
+            </div>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-header" onclick="toggleFeature(this)">
+                <span>3. `isEmpty()` on Optional</span>
+                <span class="arrow-icon">&#9658;</span>
+            </div>
+            <div class="feature-content">
+                <p>Java 11 added the `isEmpty()` method to the `java.util.Optional` class. This is a convenient way to check if an `Optional` instance is empty (i.e., does not contain a value), providing a more readable alternative to `!isPresent()`.</p>
+                <h3>Example:</h3>
+                <div class="code-block" id="code-optional-isEmpty">
+<pre><code class="language-java">
+import java.util.Optional;
+
+class OptionalIsEmptyExample {
+    public static void main(String[] args) {
+        Optional&lt;String&gt; emptyOptional = Optional.empty();
+        Optional&lt;String&gt; presentOptional = Optional.of("Hello Java 11!");
+
+        System.out.println("Is emptyOptional empty? " + emptyOptional.isEmpty());
+        System.out.println("Is presentOptional empty? " + presentOptional.isEmpty());
+
+        if (emptyOptional.isEmpty()) {
+            System.out.println("emptyOptional indeed has no value.");
+        } else {
+            System.out.println("emptyOptional has a value.");
+        }
+    }
+}
+</code></pre>
+                </div>
+                <button class="toggle-button" data-target="output-optional-isEmpty">Show Output</button>
+                <button class="copy-button" data-target="code-optional-isEmpty">Copy Code</button>
+                <div class="output-block hidden" id="output-optional-isEmpty">
+<pre>
+Is emptyOptional empty? true
+Is presentOptional empty? false
+emptyOptional indeed has no value.
+</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-header" onclick="toggleFeature(this)">
+                <span>4. Deprecations and Removals</span>
+                <span class="arrow-icon">&#9658;</span>
+            </div>
+            <div class="feature-content">
+                <p>Java 11, being a Long-Term Support (LTS) release, also saw the removal of several modules that were deprecated in earlier versions (like Java 9 and 10). This aims to streamline the JDK and remove older, less maintained, or superseded technologies.</p>
+                <p>Key modules removed in Java 11 include:</p>
+                <ul>
+                    <li>`java.se.ee` (Java EE APIs)</li>
+                    <li>`java.xml.ws` (JAX-WS, plus related technologies SAAJ and Web Services Metadata)</li>
+                    <li>`java.activation` (JavaBeans Activation Framework)</li>
+                    <li>`java.transaction` (Java Transaction API)</li>
+                    <li>`java.xml.bind` (JAXB - Java Architecture for XML Binding)</li>
+                    <li>`java.corba` (CORBA)</li>
+                </ul>
+                <p>If your applications relied on these modules, you would need to add them as separate dependencies (e.g., via Maven or Gradle) if upgrading to Java 11 or later.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleFeature(headerElement) {
+            const content = headerElement.nextElementSibling;
+            const arrow = headerElement.querySelector('.arrow-icon');
+
+            if (content.classList.contains('active')) {
+                content.classList.remove('active');
+                headerElement.classList.remove('expanded');
+            } else {
+                // Close all other open features
+                document.querySelectorAll('.feature-content.active').forEach(openContent => {
+                    openContent.classList.remove('active');
+                    openContent.previousElementSibling.classList.remove('expanded');
+                });
+                // Hide all output blocks
+                document.querySelectorAll('.output-block').forEach(outputBlock => {
+                    outputBlock.classList.add('hidden');
+                });
+                // Reset all toggle buttons to "Show Output"
+                document.querySelectorAll('.toggle-button').forEach(button => {
+                    button.textContent = 'Show Output';
+                });
+
+                content.classList.add('active');
+                headerElement.classList.add('expanded');
+            }
+        }
+
+        document.querySelectorAll('.toggle-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const targetId = button.dataset.target;
+                const outputBlock = document.getElementById(targetId);
+                if (outputBlock) {
+                    outputBlock.classList.toggle('hidden');
+                    button.textContent = outputBlock.classList.contains('hidden') ? 'Show Output' : 'Hide Output';
+                }
+            });
+        });
+
+        document.querySelectorAll('.copy-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const targetId = button.dataset.target;
+                const codeBlock = document.getElementById(targetId);
+                if (codeBlock) {
+                    const codeToCopy = codeBlock.querySelector('pre code').innerText;
+                    try {
+                        const tempTextarea = document.createElement('textarea');
+                        tempTextarea.value = codeToCopy;
+                        document.body.appendChild(tempTextarea);
+                        tempTextarea.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(tempTextarea);
+                        
+                        const originalText = button.textContent;
+                        button.textContent = 'Copied!';
+                        setTimeout(() => {
+                            button.textContent = originalText;
+                        }, 2000);
+
+                    } catch (err) {
+                        console.error('Failed to copy: ', err);
+                        // Using a custom modal or message box would be preferred in a full app
+                        // For this example, a simple alert is used as a fallback if custom UI is not built
+                        alert('Failed to copy code. Please copy manually.');
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
