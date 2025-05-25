@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Java 17 Features Explorer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Visualization & Content Choices:
+        - Feature Sections: Each feature (Sealed Classes, Random Generator Factories, Pattern Matching in Switch, Enhanced Deserialization) is a distinct, collapsible HTML div. Goal: Organize, Inform. Interaction: Click to expand/collapse. Justification: Reduces visual clutter, allows focused exploration.
+        - Code Examples: Presented within <pre><code> tags. Goal: Illustrate. Interaction: Static display with copy button. Justification: Direct code reference.
+        - Output: Displayed in a separate block, toggleable. Goal: Inform. Interaction: Click to show/hide. Justification: Provides immediate context for code.
+        - No charts used as the source material is descriptive and code-based, not quantitative data.
+        - Library/Method: Vanilla JavaScript for all interactions, Tailwind CSS for styling.
+        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9; /* bg-slate-100 */
+            color: #334155; /* text-slate-800 */
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background-color: #ffffff; /* bg-white */
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background-color: #0284c7; /* bg-sky-700 */
+            color: white;
+            padding: 1.5rem;
+            border-radius: 0.75rem 0.75rem 0 0;
+            text-align: center;
+            margin: -1.5rem -1.5rem 1.5rem -1.5rem; /* Adjust to extend to container edges */
+            font-size: 2.25rem; /* text-4xl */
+            font-weight: bold; /* font-bold */
+        }
+        .feature-card {
+            border: 1px solid #e2e8f0; /* border-slate-200 */
+            border-radius: 0.5rem; /* rounded-lg */
+            overflow: hidden;
+            margin-bottom: 1rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        .feature-header {
+            background-color: #f8fafc; /* bg-slate-50 */
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600; /* font-semibold */
+            font-size: 1.25rem; /* text-xl */
+            color: #0f172a; /* text-slate-900 */
+            transition: background-color 0.2s ease;
+        }
+        .feature-header:hover {
+            background-color: #e2e8f0; /* bg-slate-200 */
+        }
+        .feature-content {
+            padding: 1.5rem;
+            border-top: 1px solid #e2e8f0; /* border-slate-200 */
+            display: none; /* Hidden by default */
+            background-color: #ffffff; /* bg-white */
+        }
+        .feature-content.active {
+            display: block;
+        }
+        .code-block {
+            background-color: #1e293b; /* bg-gray-800 */
+            color: #f8fafc; /* text-gray-50 */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.875rem;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+        .output-block {
+            background-color: #f0f4f8; /* bg-slate-200 */
+            color: #1e293b; /* text-slate-900 */
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            margin-top: 0.5rem;
+            border: 1px solid #cbd5e1; /* border-slate-300 */
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.875rem;
+            white-space: pre-wrap; /* Preserve whitespace and wrap */
+            word-break: break-all; /* Break long words */
+        }
+        .toggle-button, .copy-button {
+            background-color: #0ea5e9; /* bg-sky-500 */
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            margin-right: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .toggle-button:hover, .copy-button:hover {
+            background-color: #0284c7; /* bg-sky-600 */
+        }
+        .arrow-icon {
+            transition: transform 0.3s ease;
+        }
+        .feature-header.expanded .arrow-icon {
+            transform: rotate(90deg);
+        }
+        ul {
+            list-style-type: disc;
+            margin-left: 1.25rem;
+            margin-bottom: 1rem;
+        }
+        h3 {
+            font-size: 1.125rem; /* text-lg */
+            font-weight: 600; /* font-semibold */
+            color: #0f172a; /* text-slate-900 */
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            Java 17 Features Explorer
+        </div>
+
+        <p class="mb-6 text-lg text-center">
+            Explore key enhancements introduced in Java 17, an LTS (Long-Term Support) release, focusing on language improvements and security.
+        </p>
+
+        <div class="feature-card">
+            <div class="feature-header" onclick="toggleFeature(this)">
+                <span>1. Sealed Classes (Permanent Feature)</span>
+                <span class="arrow-icon">&#9658;</span>
+            </div>
+            <div class="feature-content">
+                <p><strong>Purpose:</strong> Sealed Classes restrict which other classes or interfaces can extend or implement them. This provides more control over class hierarchies.</p>
+                <p class="mb-4"><strong>Why it's useful:</strong> Improves control over class hierarchies, enhances security by limiting extensibility, and aids maintainability by making class relationships explicit.</p>
+                <h3>Example:</h3>
+                <div class="code-block" id="code-sealed-classes">
+<pre><code class="language-java">
+sealed interface Shape permits Circle, Rectangle {}
+
+final class Circle implements Shape {}
+final class Rectangle implements Shape {}
+
+// class Triangle implements Shape {} // This would cause a compile-time error
+</code></pre>
+                </div>
+                <button class="toggle-button" data-target="output-sealed-classes">Show Output</button>
+                <button class="copy-button" data-target="code-sealed-classes">Copy Code</button>
+                <div class="output-block hidden" id="output-sealed-classes">
+<pre>
+(No direct runtime output for this definition, but demonstrates compile-time restriction.)
+</pre>
+                </div>
+
+                <h3 class="mt-6">Pattern Matching for `instanceof` (Final Feature)</h3>
+                <p><strong>Purpose:</strong> Simplifies type checks and casting, reducing boilerplate code and improving readability.</p>
+                <div class="code-block" id="code-pattern-matching-instanceof">
+<pre><code class="language-java">
+Object obj = "Hello Java 17";
+
+if (obj instanceof String s) {
+    System.out.println(s.toUpperCase()); // No need for explicit cast
+} else {
+    System.out.println("Not a String");
+}
+</code></pre>
+                </div>
+                <button class="toggle-button" data-target="output-pattern-matching-instanceof">Show Output</button>
+                <button class="copy-button" data-target="code-pattern-matching-instanceof">Copy Code</button>
+                <div class="output-block hidden" id="output-pattern-matching-instanceof">
+<pre>
+HELLO JAVA 17
+</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-header" onclick="toggleFeature(this)">
+                <span>2. Random Generator Factories</span>
+                <span class="arrow-icon">&#9658;</span>
+            </div>
+            <div class="feature-content">
+                <p>Java 17 introduces a new API for random number generation, allowing developers to easily choose from various algorithms and create custom random generators. This provides more flexibility and control over the quality and characteristics of generated random numbers.</p>
+                <p class="mb-4">You can specify algorithms like `LXM:L128X1024MixRandom`, `Legacy:Random`, `Xoroshiro:Xoroshiro128PlusPlus`, and many more.</p>
+                <h3>Example:</h3>
+                <div class="code-block" id="code-random-generator">
+<pre><code class="language-java">
+import java.util.random.RandomGenerator;
+import java.util.random.RandomGeneratorFactory;
+
+public class RandomGeneratorExample {
+    public static void main(String[] args) {
+        // Create a default random generator
+        RandomGenerator randomGenerator = RandomGeneratorFactory.getDefault().create();
+        System.out.println("Default Random Generator Class: " + randomGenerator.getClass().getName());
+
+        // Print all available random generator algorithms
+        System.out.println("\nAvailable Random Generator Algorithms:");
+        RandomGeneratorFactory.all()
+            .map(factory -> factory.group() + ":" + factory.name())
+            .sorted()
+            .forEach(System.out::println);
+
+        // Generate 5 random numbers between 0 and 19 using the default generator
+        System.out.println("\nGenerating 5 random numbers (0-19):");
+        for (int i = 0; i < 5; i++) {
+            System.out.println(randomGenerator.nextInt(20));
+        }
+
+        // Example: Creating a specific algorithm with a seed
+        RandomGenerator specificGenerator = RandomGeneratorFactory.of("LXM:L64X128MixRandom").create(888L);
+        System.out.println("\nSpecific Generator (LXM:L64X128MixRandom) nextInt: " + specificGenerator.nextInt(100));
+    }
+}
+</code></pre>
+                </div>
+                <button class="toggle-button" data-target="output-random-generator">Show Output</button>
+                <button class="copy-button" data-target="code-random-generator">Copy Code</button>
+                <div class="output-block hidden" id="output-random-generator">
+<pre>
+Default Random Generator Class: jdk.random.L32X64MixRandom
+
+Available Random Generator Algorithms:
+LXM:L128X1024MixRandom
+LXM:L128X128MixRandom
+LXM:L128X256MixRandom
+LXM:L32X64MixRandom
+LXM:L64X1024MixRandom
+LXM:L64X128MixRandom
+LXM:L64X128StarStarRandom
+LXM:L64X256MixRandom
+Legacy:Random
+Legacy:SecureRandom
+Legacy:SplittableRandom
+Xoroshiro:Xoroshiro128PlusPlus
+Xoshiro:Xoshiro256PlusPlus
+
+Generating 5 random numbers (0-19):
+12
+11
+10
+1
+11
+
+Specific Generator (LXM:L64X128MixRandom) nextInt: 42
+</pre>
+                </div>
+                <p class="text-sm text-slate-600 mt-2">Note: The exact random numbers generated will vary.</p>
+            </div>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-header" onclick="toggleFeature(this)">
+                <span>3. Pattern Matching in Switch</span>
+                <span class="arrow-icon">&#9658;</span>
+            </div>
+            <div class="feature-content">
+                <p>Java 17 enhances the `switch` expression and statement to allow pattern matching. This significantly simplifies conditional logic that involves type checks and casting, making code more concise and readable.</p>
+                <p class="mb-4">It also supports `null` values directly in `case` labels, eliminating the need for separate `if (obj == null)` checks.</p>
+                <h3>Example: Calculating Perimeter (with Records)</h3>
+                <div class="code-block" id="code-pattern-matching-switch">
+<pre><code class="language-java">
+interface Shape {}
+record Circle(double radius) implements Shape {}
+record Rectangle(double length, double width) implements Shape {}
+
+class ShapeCalculator {
+    // Using enhanced switch with pattern matching
+    public static double getPerimeterUsingSwitch(Shape shape) {
+        return switch(shape) {
+            case Circle c -> 2 * Math.PI * c.radius();
+            case Rectangle r -> 2 * (r.length() + r.width());
+            default -> throw new IllegalArgumentException("Unexpected Value: " + shape);
+        };
+    }
+
+    public static void main(String[] args) {
+        System.out.println("Circle Perimeter: " + getPerimeterUsingSwitch(new Circle(10)));
+        System.out.println("Rectangle Perimeter: " + getPerimeterUsingSwitch(new Rectangle(10, 5)));
+    }
+}
+</code></pre>
+                </div>
+                <button class="toggle-button" data-target="output-pattern-matching-switch">Show Output</button>
+                <button class="copy-button" data-target="code-pattern-matching-switch">Copy Code</button>
+                <div class="output-block hidden" id="output-pattern-matching-switch">
+<pre>
+Circle Perimeter: 62.83185307179586
+Rectangle Perimeter: 30.0
+</pre>
+                </div>
+
+                <h3 class="mt-6">Example: Null Support in Switch</h3>
+                <div class="code-block" id="code-null-switch">
+<pre><code class="language-java">
+class NullSwitchExample {
+    public static void testNullSupport(Object obj){
+        switch(obj){
+            case String s -> System.out.println("Value is a String: " + s);
+            case null -> System.out.println("Value is Null");
+            default -> System.out.println("Value is neither String nor Null");
+        }
+    }
+
+    public static void main(String[] args) {
+        testNullSupport("Hello");
+        testNullSupport(null);
+        testNullSupport(56);
+    }
+}
+</code></pre>
+                </div>
+                <button class="toggle-button" data-target="output-null-switch">Show Output</button>
+                <button class="copy-button" data-target="code-null-switch">Copy Code</button>
+                <div class="output-block hidden" id="output-null-switch">
+<pre>
+Value is a String: Hello
+Value is Null
+Value is neither String nor Null
+</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-header" onclick="toggleFeature(this)">
+                <span>4. Enhanced Deserialization Filters</span>
+                <span class="arrow-icon">&#9658;</span>
+            </div>
+            <div class="feature-content">
+                <p><strong>Purpose:</strong> Deserialization is the process of converting a byte stream back into a Java object. However, it can be a security risk if untrusted data is deserialized — attackers can exploit this to inject malicious objects.</p>
+                <p class="mb-4">Java 17 improves this by making it easier to configure and enforce deserialization filters, which control what classes can be deserialized.</p>
+                
+                <h3>Why it's important?</h3>
+                <ul class="list-disc list-inside pl-4 mb-4">
+                    <li>Prevents deserialization of unexpected or dangerous classes.</li>
+                    <li>Helps avoid common security vulnerabilities like Remote Code Execution (RCE).</li>
+                    <li>Gives developers more control over what data is allowed during deserialization.</li>
+                </ul>
+
+                <h3>How does it work?</h3>
+                <p class="mb-2">You can define a global filter using a system property or programmatically.</p>
+
+                <h4>Example: Setting a Global Filter via System Property</h4>
+                <p class="mb-2">This filter is applied when the JVM starts. It's useful for broad, application-wide policies.</p>
+                <div class="code-block">
+<pre><code class="language-bash">
+java -Djdk.serialFilter="maxdepth=5;classes=java.base/*;reject=java.util.HashMap" MyApp
+</code></pre>
+                </div>
+                <p class="mb-4">This filter would:</p>
+                <ul class="list-disc list-inside pl-4 mb-4">
+                    <li>Limit object graph depth to 5.</li>
+                    <li>Allow only classes from `java.base`.</li>
+                    <li>Reject `HashMap` deserialization.</li>
+                </ul>
+
+                <h4>Example: Programmatic Filter</h4>
+                <p class="mb-2">This allows for more fine-grained control, where you can set a filter on a specific `ObjectInputStream`.</p>
+                <div class="code-block" id="code-deserialization-filter">
+<pre><code class="language-java">
+import java.io.*;
+import java.io.ObjectInputFilter.Status;
+
+public class DeserializationExample {
+    public static void main(String[] args) throws Exception {
+        // This example assumes 'data.ser' exists and contains a serialized object.
+        // For demonstration, we'll simulate a stream that would typically read from a file.
+        // In a real scenario, you'd read from a FileInputStream.
+
+        // Simulate a byte array input stream for demonstration
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(bos);
+        oos.writeObject("A simple String object"); // Serialize a String
+        oos.close();
+
+        ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
+        ObjectInputStream in = new ObjectInputStream(bis);
+        
+        // Set a custom filter
+        in.setObjectInputFilter(info -> {
+            // Allow only classes from the java.lang package
+            if (info.serialClass() != null && info.serialClass().getName().startsWith("java.lang")) {
+                return Status.ALLOWED;
+            }
+            // Reject all other classes
+            return Status.REJECTED;
+        });
+
+        // Attempt to read the object; will only allow java.lang classes due to filter
+        try {
+            Object obj = in.readObject(); 
+            System.out.println("Deserialized object: " + obj);
+        } catch (InvalidClassException e) {
+            System.out.println("Deserialization failed due to filter: " + e.getMessage());
+        }
+        in.close();
+    }
+}
+</code></pre>
+                </div>
+                <button class="toggle-button" data-target="output-deserialization-filter">Show Output</button>
+                <button class="copy-button" data-target="code-deserialization-filter">Copy Code</button>
+                <div class="output-block hidden" id="output-deserialization-filter">
+<pre>
+Deserialized object: A simple String object
+</pre>
+                </div>
+                <p class="mt-3"><strong>Summary:</strong> Enhanced Deserialization Filters in Java 17 improve security by controlling what classes can be deserialized, preventing deserialization attacks.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleFeature(headerElement) {
+            const content = headerElement.nextElementSibling;
+            const arrow = headerElement.querySelector('.arrow-icon');
+
+            if (content.classList.contains('active')) {
+                content.classList.remove('active');
+                headerElement.classList.remove('expanded');
+            } else {
+                // Close all other open features
+                document.querySelectorAll('.feature-content.active').forEach(openContent => {
+                    openContent.classList.remove('active');
+                    openContent.previousElementSibling.classList.remove('expanded');
+                });
+                // Hide all output blocks
+                document.querySelectorAll('.output-block').forEach(outputBlock => {
+                    outputBlock.classList.add('hidden');
+                });
+                // Reset all toggle buttons to "Show Output"
+                document.querySelectorAll('.toggle-button').forEach(button => {
+                    button.textContent = 'Show Output';
+                });
+
+                content.classList.add('active');
+                headerElement.classList.add('expanded');
+            }
+        }
+
+        document.querySelectorAll('.toggle-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const targetId = button.dataset.target;
+                const outputBlock = document.getElementById(targetId);
+                if (outputBlock) {
+                    outputBlock.classList.toggle('hidden');
+                    button.textContent = outputBlock.classList.contains('hidden') ? 'Show Output' : 'Hide Output';
+                }
+            });
+        });
+
+        document.querySelectorAll('.copy-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const targetId = button.dataset.target;
+                const codeBlock = document.getElementById(targetId);
+                if (codeBlock) {
+                    const codeToCopy = codeBlock.querySelector('pre code').innerText;
+                    try {
+                        const tempTextarea = document.createElement('textarea');
+                        tempTextarea.value = codeToCopy;
+                        document.body.appendChild(tempTextarea);
+                        tempTextarea.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(tempTextarea);
+                        
+                        const originalText = button.textContent;
+                        button.textContent = 'Copied!';
+                        setTimeout(() => {
+                            button.textContent = originalText;
+                        }, 2000);
+
+                    } catch (err) {
+                        console.error('Failed to copy: ', err);
+                        // Using a custom modal or message box would be preferred in a full app
+                        // For this example, a simple alert is used as a fallback if custom UI is not built
+                        alert('Failed to copy code. Please copy manually.');
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
